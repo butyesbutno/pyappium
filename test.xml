@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<TestCases xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.6283.29081">
+
+	<testcase loop="1" platform="ios" desc="only for ios platform" version="0.1" author="michael" >
+		<!-- 
+			platform = ios / android / ios-android
+		-->
+		<step id="com.xxx.buyer:id/xxx" text="test" />
+		<step id="com.xxx.buyer:id/xxx" click="true" />
+		<step id="com.xxx.buyer:id/xxx" checkexist="true" />
+		<step id="com.xxx.buyer:id/xxx" checkvalue="100" />
+		<step screensnapshot />
+		<step swipe="2/3,1/3,1/3,1/3,1000" />
+		<theloop field1="@col:0,sheet:0,e:/a.xls" field2="@col:1,sheet:0,e:/a.xls" loop="1" >
+			<!-- 
+				if loop not set, 
+					field* not set -> loop one times
+					field* set -> loop times as it can
+			-->
+			<step id="com.xxx.buyer:id/xxx" text="@field1" />
+			<step id="com.xxx.buyer:id/xxx" text="@field2" />
+			<step id="com.xxx.buyer:id/xxx" click="true" />
+			<step id="com.xxx.buyer:id/xxx" checkexist="true" />
+		</theloop>
+		<step h5="true" xpath="//*[@id=\"word\"]" click="true" />
+		<step h5="true" xpath="//*[@id=\"word\"]" checkexist="true" />
+	</testcase>
+	<testcase />
+</TestCases>

@@ -2,10 +2,19 @@
 #coding: utf-8
 #python 2.7 / 3.X
 
-#Apache License
-#Version 2.0, January 2004
-#http://www.apache.org/licenses/
-						
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# email: michael.wangh@gmail.com
+
 """python app test framework
 
 Usage:
@@ -30,6 +39,7 @@ Example:
 import os,sys,unittest,subprocess,datetime
 from comm import HTMLTestRunner, pyconfig
 from docopt import docopt
+from xml.etree import ElementTree
 
 __author__ = "Michael Wang"
 __version__ = "0.1.0"
@@ -117,3 +127,15 @@ if __name__ == "__main__":
 	runner = HTMLTestRunner.HTMLTestRunner(stream=fp, title=title, description=description)
 	runner.run(tests, deviceName)
 	fp.close()
+
+	# execute xml format testcase
+    root = ElementTree.parse("e:/test.xml")
+    testcases = root.findall("testcase")
+
+    i = 0
+    suit = unittest.TestSuite()
+    for testcaseNode in testcases:
+        a = XmlTest(testcaseNode)
+        setattr(xmlttt, "test" + str(i), a.testXml())
+        suit.addTests(unittest.makeSuite(xmlttt))
+    unittest.TextTestRunner().run(suit)

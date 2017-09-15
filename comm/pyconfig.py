@@ -5,7 +5,7 @@ desired_caps = {
             'appPackage': 'com.hele.buyer',
             'appActivity': 'com.hele.buyer.MainActivity',
             'platformName': 'Android',
-            'platformVersion': '5.1',
+            'platformVersion': '6.0',
             'deviceName': 'TBSDU1553002798',
 			'unicodeKeyboard': 'True',
 			'resetKeyboard':'True'

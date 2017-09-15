@@ -28,13 +28,13 @@ class FenLei(unittest.TestCase):
 		fenlei_page.click()
 
 		# 分类列表
-		leibies = pyLib.tryGetElements(self.driver, 'com.hele.buyer:id/name')
+		leibies = pyLib.getElements(self.driver, 'com.hele.buyer:id/name')
 		if leibies != None:
 			for leibie in leibies:
 				leibie.click()
 				print(u'遍历类别'+leibie.text)
 				# 遍历分类的子项目
-				items = pyLib.tryGetElements(self.driver, 'com.hele.buyer:id/name')
+				items = pyLib.getElements(self.driver, 'com.hele.buyer:id/name')
 				for item in items:
 					print(u'子分类'+item.text)
 

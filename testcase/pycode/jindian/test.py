@@ -43,7 +43,7 @@ class NearbyShop(unittest.TestCase):
 		for i in range(10):
 			
 			#测试店铺
-			shops = pyLib.tryGetElements(self.driver, 'com.hele.buyer:id/shop_name')
+			shops = pyLib.getElements(self.driver, 'com.hele.buyer:id/shop_name')
 			if shops != None:
 				for shop in shops:
 					if shopLogic.shoptest(self.driver, shop) == False:

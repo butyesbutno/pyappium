@@ -25,7 +25,7 @@ class Login(unittest.TestCase):
 
 	def forceLogout(self):
 		'''内部函数，强制退出登录'''
-		
+
 		# 确定 进入到的页面
 		my_page = pyLib.getElement(self.driver, 'com.hele.buyer:id/tab_person')
 		if my_page:
@@ -76,12 +76,13 @@ class Login(unittest.TestCase):
 			# 找到密码输入框
 			print(u'准备输入用户名%s，密码%s' % (user, passwd) )
 			passwdview=pyLib.tryGetElement(self.driver, 'com.hele.buyer:id/pwdCET')
-			passwdview.send_keys(passwd)
+			pyLib.setTextValue(passwdview, passwd)
+			#passwdview.send_keys(passwd)
 			userview=pyLib.tryGetElement(self.driver, 'com.hele.buyer:id/phoneCET')
 			userview.click()
 			context2=userview.get_attribute('text')#获取文本框里的内容
 			pyLib.edittextclear(self.driver, context2)#删除文本框中是内容
-			userview.send_keys(user)
+			pyLib.setTextValue(userview, user)
 			
 			# 登录
 			print(u'尝试登录')
@@ -121,12 +122,12 @@ class Login(unittest.TestCase):
 			# 找到密码输入框
 			print(u'准备输入用户名%s，密码%s' % (user, passwd) )
 			passwdview=pyLib.tryGetElement(self.driver, 'com.hele.buyer:id/pwdCET')
-			passwdview.send_keys(passwd)
+			pyLib.setTextValue(passwdview, passwd)
 			userview=pyLib.tryGetElement(self.driver, 'com.hele.buyer:id/phoneCET')
 			userview.click()
 			context2=userview.get_attribute('text')#获取文本框里的内容
 			pyLib.edittextclear(self.driver, context2)#删除文本框中是内容
-			userview.send_keys(user)
+			pyLib.setTextValue(userview, user)
 			
 			# 登录
 			print(u'尝试登录')
