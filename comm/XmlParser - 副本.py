@@ -58,14 +58,15 @@ class _XmlTest(unittest.TestCase):
 				self._xmlmethodNode.append(step)
 
 	# check xml
-	def __exe_xmlMethod(self, driver, method_name):
+	def __exe_xmlMethod(self, drvier, method_name):
 
 		for xmlmethod in self._xmlmethodNode:
-			if(xmlmethod.attrib["name"] != method_name):
+			if(xmlmethod.tag != method_name):
 				continue
 			lst = xmlmethod.getchildren()
 			for n in lst:
-				if ( self.__exe_step(driver, n.attrib) == False) :
+				if ( self.__exe_step(driver, n) == False) :
+					print("here with error")
 					return False
 		return True
 
@@ -73,10 +74,10 @@ class _XmlTest(unittest.TestCase):
 	def __exe_step(self, driver, oneStep, *args, **awd):
 
 		# No exception when access dict
-		def SafeAccessStepDict(key, field_translate=True):
+		def SafeAccessStepDict(oneStep, key, **awd):
 			try:
 				val = oneStep[key]
-				if field_translate and awd :
+				if awd :
 					fields = awd["fields"]
 					for (k,v) in fields.items():
 						val = val.replace("@" + k, v)
@@ -85,19 +86,19 @@ class _XmlTest(unittest.TestCase):
 				return None
 
 		# step desc
-		desc = SafeAccessStepDict("desc")
+		desc = SafeAccessStepDict(oneStep, "desc", **awd)
 		if desc != None:
 			print(desc)
 
 		# try execute this step
-		h5 = SafeAccessStepDict("h5")
+		h5 = SafeAccessStepDict(oneStep, "h5", **awd)
 		if h5 and h5 == "true":
-			xpath = SafeAccessStepDict("xpath")
+			xpath = SafeAccessStepDict(oneStep, "xpath", **awd)
 			pass
 		else:
-			id = SafeAccessStepDict("id")
-			screensnapshot = SafeAccessStepDict("screensnapshot")
-			swipe = SafeAccessStepDict("swipe")
+			id = SafeAccessStepDict(oneStep, "id", **awd)
+			screensnapshot = SafeAccessStepDict(oneStep, "screensnapshot", **awd)
+			swipe = SafeAccessStepDict(oneStep, "swipe", **awd)
 			if screensnapshot:
 				filepath = self._basedir + 'screenshot/' +  "Error_%d.png" % int(time.strftime("%Y%m%d%H%M"))
 				driver.get_screenshot_as_file(filepath)
@@ -112,8 +113,8 @@ class _XmlTest(unittest.TestCase):
 				return True
 			if id:
 				# check the element exist
-				checkexist = SafeAccessStepDict("checkexist")
-				checkvalue = SafeAccessStepDict("checkvalue")
+				checkexist = SafeAccessStepDict(oneStep, "checkexist", **awd)
+				checkvalue = SafeAccessStepDict(oneStep, "checkvalue", **awd)
 				element = pyLib.tryGetElement(driver, id)
 				if checkexist:
 					if checkexist == "true" :
@@ -123,12 +124,12 @@ class _XmlTest(unittest.TestCase):
 					return True
 
 				#ifexist
-				ifexist = SafeAccessStepDict("ifexist", False)
+				ifexist = SafeAccessStepDict(oneStep, "ifexist")
 				if ifexist and ifexist.startswith('@'):
 					if( self.__exe_xmlMethod(driver, ifexist[1:]) == False) :
 						return False
 				#ifnotexist
-				ifnotexist = SafeAccessStepDict("ifnotexist", False)
+				ifnotexist = SafeAccessStepDict(oneStep, "ifnotexist")
 				if ifnotexist and ifnotexist.startswith('@'):
 					if( self.__exe_xmlMethod(driver, ifnotexist[1:]) == False) :
 						return False
@@ -140,12 +141,12 @@ class _XmlTest(unittest.TestCase):
 					return True
 
 				# set text?
-				text = SafeAccessStepDict("text")
+				text = SafeAccessStepDict(oneStep, "text", **awd)
 				if text:
 					pyLib.setTextValue(element, text)
 
 				# Just click?
-				click = SafeAccessStepDict("click")
+				click = SafeAccessStepDict(oneStep, "click", **awd)
 				if click:
 					element.click()
 
@@ -217,6 +218,7 @@ class _XmlTest(unittest.TestCase):
 				seq = 1
 				while(True):
 
+					print("Loop "+ loopdesc + " execute sequence %d" % seq)
 					# yield the parameters
 					fields = {}
 					fieldgen_no_data = False
@@ -231,14 +233,13 @@ class _XmlTest(unittest.TestCase):
 					if loop_untile_nodata and fieldgen_no_data:
 						break
 
-					print("Loop "+ loopdesc + " execute sequence %d" % seq)
 					# execute this loop!
 					for j in range(total_steps):
 						if(self.__exe_step(driver, oneStep[j+1], fields=fields) == False):
 							driver.quit()
 							return False
 
-					if loop_untile_nodata == False and seq >= loopcount:
+					if seq >= loopcount:
 						break
 					seq = seq + 1
 			else:

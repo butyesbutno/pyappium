@@ -9,12 +9,13 @@
 		<theloop field1="@col:0,sheet:0,test.xls" field2="@col:1,sheet:0,test.xls"  field3="@col:2,sheet:0,test.xls">
 			<step id="com.hele.buyer:id/tab_person" click="true" />
 			<step id="com.hele.buyer:id/setting" ifexist="@logout" />
-			<step id="com.hele.buyer:id/pwdCET" text="@field2" desc="输入密码" />
+			<step id="com.hele.buyer:id/pwdCET" text="@field2" desc="输入用户名：@field1,密码:@field2,成功：@field3" />
 			<step id="com.hele.buyer:id/phoneCET" text="@field1" />
 			<step id="com.hele.buyer:id/loginBT" click="true" />
 			<step id="com.hele.buyer:id/setting" checkexist="@field3" />
 		</theloop>
 		<xmlmethod name="logout">
+			<step id="com.hele.buyer:id/setting" click="true" />
 			<step id="com.hele.buyer:id/login_out" click="true" />
 			<step id="com.hele.buyer:id/right" click="true" />
 			<step id="com.hele.buyer:id/tab_person" click="true" />
