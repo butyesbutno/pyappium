@@ -4,7 +4,7 @@
 from appium import webdriver
 import unittest,os,time,io
 import xlrd
-from comm import pyconfig, pyLib
+from comm import pyLib
 
 class Login(unittest.TestCase):
 	'''我的'''
@@ -13,7 +13,7 @@ class Login(unittest.TestCase):
 		'''测试准备工作'''
 
 		# appium & 启动app/activity
-		self.driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', pyconfig.desired_caps)
+		self.driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', desired_caps)
 		
 		# xls 初始化
 		BASE_DIR = os.path.dirname(os.path.abspath(__file__))

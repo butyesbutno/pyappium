@@ -37,7 +37,8 @@ Example:
 	pyappium -r login,h5
 """
 import os,sys,unittest,subprocess,datetime
-from comm import HTMLTestRunner, pyconfig
+from comm import *
+from config import *
 from docopt import docopt
 from xml.etree import ElementTree
 
@@ -46,7 +47,7 @@ __version__ = "0.1.0"
 
 if __name__ == "__main__":
 	
-	# 获取命令行参数
+	# 获取命令行参数 / obtain the commandline parameters
 	if sys.version_info.major > 2:
 		arguments = docopt(__doc__)
 	else:
@@ -64,7 +65,7 @@ if __name__ == "__main__":
 	if remove_suite != None:
 		remove_suite_list = remove_suite.split(',')
 
-	# 获取当前正在链接的设备
+	# 获取当前正在链接的设备 / the connected mobile phone
 	if deviceName == None :
 		subp = subprocess.Popen('adb devices',shell=True,stdout=subprocess.PIPE)
 		l = subp.stdout.readline()
@@ -76,20 +77,20 @@ if __name__ == "__main__":
 	if deviceName == None :
 		print(u"当前没有设备链接")
 		exit(0)
-	pyconfig.desired_caps['deviceName']=deviceName
+	desired_caps['deviceName']=deviceName
 	print("Run test on %s" % deviceName)
 	
-	# 上一级基准目录
+	# 上一级基准目录 / the base path
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 	
-	# 是否指定了app文件以及路径
+	# 是否指定了app文件以及路径 / Does the apk exist?
 	if appName != None:
-		pyconfig.desired_caps['app']=BASE_DIR + '/apps/' + appName
-		if(os.path.exists(pyconfig.desired_caps['app']) == False):
-			print(u'%s 不存在' % pyconfig.desired_caps['app'])
+		desired_caps['app']=BASE_DIR + '/apps/' + appName
+		if(os.path.exists(desired_caps['app']) == False):
+			print(u'%s 不存在' % desired_caps['app'])
 			exit(0)
 
-	# 生成测试报告目录
+	# 生成测试报告目录 / create the test report directory
 	reportpath = BASE_DIR + '/report/'
 	try:
 		os.mkdir(reportpath)
@@ -99,43 +100,27 @@ if __name__ == "__main__":
 	#reportpath += "report-" + '%d-%02d-%02d-%02d-%02d-%02d' % (t.year,t.month,t.day,t.hour, t.minute, t.second) + '.html'
 	reportpath += 'report.html'
 
-	# 执行../testcase/以及子目录测试用例
-	basepath = BASE_DIR + "/testcase/"
-	tests = unittest.suite.TestSuite()
-	for filename in os.listdir(basepath):
-	
-		# 每一个子目录测试用例都要执行，生成相应的测试报告html形式
-		childpath = os.path.join(basepath, filename)
-		if os.path.isdir(childpath):
+	# 执行../testcase/CurAppName/以及子目录测试用例 / execute testcases under ../testcase/CurAppName/
+	basepath = BASE_DIR + "/testcase/" + CurAppName
+	suit = unittest.TestSuite()
 
-			# 此目录暂时不参加测试?
-			try:
-				if remove_suite_list != None and remove_suite_list.index(filename) >= 0:
-					continue;
-			except:
-				pass
+	# 构建所有xml格式的测试用例 / build all testcase write by xml
+	xml_testcases = pyLib.walkXmlFiles(basepath + "/xml/", remove_suite_list)
+	suit.addTests(makeXmlSuite(xml_testcases))
 
-			# find the test case under childpath
-			newtestsuit = unittest.TestLoader()
-			tests.addTests( newtestsuit.discover(start_dir=childpath, pattern='test*.py', top_level_dir=None) )
-			
-		else:
-			continue
+	# 查找所有python格式的用例 / build all testcase write by python code
+	py_testcases = pyLib.walkPyFiles(basepath + "/pycode/", remove_suite_list)
+	basepath_len = len(BASE_DIR)+1
+	for pyfile in py_testcases:
+		pyfile = pyfile[basepath_len:-3]
+		pyfile = pyfile.replace('/', '.')
+		pyfile = pyfile.replace('\\', '.')
+		pyfile = pyfile.replace('\\\\', '.')
+		suit.addTests(unittest.defaultTestLoader.loadTestsFromName(pyfile))
 
 	# execute the test case
 	fp = open(reportpath, 'wb')	
-	runner = HTMLTestRunner.HTMLTestRunner(stream=fp, title=title, description=description)
-	runner.run(tests, deviceName)
+	runner = HTMLTestRunner(stream=fp, title=title, description=description)
+	runner.run(suit, deviceName)
 	fp.close()
 
-	# execute xml format testcase
-    root = ElementTree.parse("e:/test.xml")
-    testcases = root.findall("testcase")
-
-    i = 0
-    suit = unittest.TestSuite()
-    for testcaseNode in testcases:
-        a = XmlTest(testcaseNode)
-        setattr(xmlttt, "test" + str(i), a.testXml())
-        suit.addTests(unittest.makeSuite(xmlttt))
-    unittest.TextTestRunner().run(suit)

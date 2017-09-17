@@ -11,7 +11,7 @@
 		<step id="com.xxx.buyer:id/xxx" checkvalue="100" />
 		<step screensnapshot />
 		<step swipe="2/3,1/3,1/3,1/3,1000" />
-		<theloop field1="@col:0,sheet:0,e:/a.xls" field2="@col:1,sheet:0,e:/a.xls" loop="1" >
+		<theloop field1="@col:0,sheet:0,e:/a.xls" field2="@col:1,sheet:0,e:/a1.xls" filed3="nochangedpara" loop="1" >
 			<!-- 
 				if loop not set, 
 					field* not set -> loop one times

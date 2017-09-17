@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<TestCases xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.6283.29081">
+
+	<testcase loop="1" platform="ios-android" desc="登录测试" version="0.1" author="michael" >
+		<!-- 
+			platform = ios / android / ios-android
+		-->
+		<step id="com.hele.buyer:id/tab_index" checkexist="true"  />
+		<theloop field1="@col:0,sheet:0,test.xls" field2="@col:1,sheet:0,test.xls"  field3="@col:2,sheet:0,test.xls">
+			<step id="com.hele.buyer:id/tab_person" click="true" />
+			<step id="com.hele.buyer:id/setting" ifexist="@logout" />
+			<step id="com.hele.buyer:id/pwdCET" text="@field2" desc="输入密码" />
+			<step id="com.hele.buyer:id/phoneCET" text="@field1" />
+			<step id="com.hele.buyer:id/loginBT" click="true" />
+			<step id="com.hele.buyer:id/setting" checkexist="@field3" />
+		</theloop>
+		<xmlmethod name="logout">
+			<step id="com.hele.buyer:id/login_out" click="true" />
+			<step id="com.hele.buyer:id/right" click="true" />
+			<step id="com.hele.buyer:id/tab_person" click="true" />
+		</xmlmethod>
+	</testcase>
+
+</TestCases>

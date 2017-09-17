@@ -194,10 +194,10 @@ function showOutput(id, name) {
 
 <div class='page-header'>
 <h1>自动化测试报告</h1>
-<p class='attribute'><strong>开始时间:</strong> 2017-09-14 14:41:08</p>
-<p class='attribute'><strong>运行时长:</strong> 0:02:01.054055</p>
-<p class='attribute'><strong>机器:</strong> emulator-5554</p>
-<p class='attribute'><strong>状态:</strong> 通过 1 错误 1</p>
+<p class='attribute'><strong>开始时间:</strong> 2017-09-17 21:11:23</p>
+<p class='attribute'><strong>运行时长:</strong> 0:00:43.062052</p>
+<p class='attribute'><strong>机器:</strong> 0715f7db9d353f38</p>
+<p class='attribute'><strong>状态:</strong> 通过 1</p>
 
 </div>
 <p class='description'>用例执行情况</p>
@@ -228,17 +228,17 @@ function showOutput(id, name) {
 	<td>查看</td>
 </tr>
 
-<tr class='errorClass'>
-	<td>我的</td>
-	<td>2</td>
+<tr class='passClass'>
+	<td>XML 测试用例</td>
+	<td>1</td>
 	<td>1</td>
 	<td>0</td>
-	<td>1</td>
-	<td><a href="javascript:showClassDetail('c1',2)">详情</a></td>
+	<td>0</td>
+	<td><a href="javascript:showClassDetail('c1',1)">详情</a></td>
 </tr>
 
 <tr id='pt1.1' class='hiddenRow'>
-	<td class='none'><div class='testcase'>错误登录</div></td>
+	<td class='none'><div class='testcase'>登录测试</div></td>
 	<td colspan='5' align='center'>
 
 	<!--css div popup start-->
@@ -252,39 +252,11 @@ function showOutput(id, name) {
 		</div>
 		<pre>
 		
-pt1.1: ----------错误登录----------
-准备输入用户名18938884424，密码pw2sdafdsaf
-尝试登录
-
-
-		</pre>
-	</div>
-	<!--css div popup end-->
-
-	</td>
-</tr>
-
-<tr id='ft1.2' class='none'>
-	<td class='errorCase'><div class='testcase'>正确登录</div></td>
-	<td colspan='5' align='center'>
-
-	<!--css div popup start-->
-	<a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_ft1.2')" >
-		错误</a>
-
-	<div id='div_ft1.2' class="popup_window">
-		<div style='text-align: right; color:red;cursor:pointer'>
-		<a onfocus='this.blur();' onclick="document.getElementById('div_ft1.2').style.display = 'none' " >
-		   [x]</a>
-		</div>
-		<pre>
-		
-ft1.2: ----------正确登录----------
-准备输入用户名18938884424，密码kong1121K
-Traceback (most recent call last):
-  File "E:\work\appiumframework\pyappium\testcase\login\testLogin.py", line 82, in testLoginOk
-    userview.click()
-AttributeError: 'NoneType' object has no attribute 'click'
+pt1.1: 登录测试, write by michael, for ios-android, version 0.1
+Loop  execute sequence 1
+输入密码
+get real textkong1121K
+get real text18938884424
 
 
 		</pre>
@@ -296,10 +268,10 @@ AttributeError: 'NoneType' object has no attribute 'click'
 
 <tr id='total_row'>
 	<td>总计</td>
-	<td>2</td>
+	<td>1</td>
 	<td>1</td>
 	<td>0</td>
-	<td>1</td>
+	<td>0</td>
 	<td>&nbsp;</td>
 </tr>
 </table>

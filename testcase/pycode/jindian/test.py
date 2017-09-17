@@ -3,7 +3,7 @@
 
 import unittest,os,time,io,xlrd
 from appium import webdriver
-from comm import pyconfig, pyLib
+from comm import pyLib
 from app_logic import shopLogic
 
 class NearbyShop(unittest.TestCase):
@@ -12,7 +12,7 @@ class NearbyShop(unittest.TestCase):
 	def setUp(self):
 		'''测试准备工作'''
 		# appium & 启动app/activity
-		self.driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', pyconfig.desired_caps)
+		self.driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', desired_caps)
 		
 	def tearDown(self):
 		'''测试结束工作'''
