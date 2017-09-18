@@ -39,15 +39,14 @@ class NearbyShop(unittest.TestCase):
 		self.assertEqual(waitting, None)
 			
 		# 商品列表
-		success = True
 		for i in range(10):
 			
 			#测试店铺
 			shops = pyLib.getElements(self.driver, 'com.hele.buyer:id/shop_name')
 			if shops != None:
 				for shop in shops:
-					if shopLogic.shoptest(self.driver, shop) == False:
-						success = False
+					shopLogic.shoptest(self.driver, shop)
+
 			# 测试商品
 			good1 = pyLib.getElements(self.driver, 'com.hele.buyer:id/iv_goods_1')
 			good2 = pyLib.getElements(self.driver, 'com.hele.buyer:id/iv_goods_2')
@@ -56,8 +55,7 @@ class NearbyShop(unittest.TestCase):
 			for good in goods:
 				if good == None :
 					continue
-				if shopLogic.goodtest(self.driver, good) == False:
-					success = False
+				shopLogic.goodtest(self.driver, good)
 			
 			# 滚动屏幕
 			lastStr = self.driver.page_source
@@ -65,8 +63,6 @@ class NearbyShop(unittest.TestCase):
 			if lastStr == self.driver.page_source :
 				print(u"滑动%d次到达底部" % (i+1))
 				break
-		
-		self.assertEqual(success, True)
 		
 if __name__ == "__main__":
 	unittest.main()

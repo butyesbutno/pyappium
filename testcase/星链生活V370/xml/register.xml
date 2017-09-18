@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <TestCases xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.6283.29081">
 
-	<testcase platform="ios-android" desc="登录测试" version="0.1" author="michael" >
+	<testcase1 platform="ios-android" desc="登录测试" version="0.1" author="kk" >
 		<!-- 
 			platform = ios / android / ios-android
 		-->
 		<step id="com.hele.buyer:id/tab_index" checkexist="true"  />
-		<theloop field1="@xls,col:0,sheet:0,test.xls" field2="xls,@col:1,sheet:0,test.xls"  field3="xls,@col:2,sheet:0,test.xls" loopcount="1" >
+		<theloop field1="@xls,col:0,sheet:0,test.xls" field2="@xls,col:1,sheet:0,test.xls"  field3="@xls,col:2,sheet:0,test.xls" loopcount="1" >
 			<!-- 
 				field* 
 					"@xls,col:0,sheet:0,test.xls", fetch from test.xls every loop
@@ -18,7 +18,7 @@
 			-->
 			<step id="com.hele.buyer:id/tab_person" click="true" />
 			<step id="com.hele.buyer:id/setting" ifexist="@xml:logout" />
-			<step id="com.hele.buyer:id/pwdCET" text="@field2" desc="输入用户名：@field1,密码:@field2,成功：@field3" />
+			<step id="com.hele.buyer:id/pwdCET" text="@field2" desc="输入用户名：@field1,密码:@field2,预期成功：@field3" />
 			<step id="com.hele.buyer:id/phoneCET" text="@field1" />
 			<step id="com.hele.buyer:id/loginBT" click="true" />
 			<step id="com.hele.buyer:id/setting" checkexist="@field3" />
@@ -29,6 +29,18 @@
 			<step id="com.hele.buyer:id/right" click="true" />
 			<step id="com.hele.buyer:id/tab_person" click="true" />
 		</xmlmethod>
+	</testcase1>
+	
+	
+	
+	
+    <testcase platform="ios-android" desc="fenlei测试" version="0.1" author="michael" >
+		<step id="com.hele.buyer:id/tab_goods" checkexist="true"  />
+		<step id="com.hele.buyer:id/tab_goods" click="true" sleep="2" />
+		<theloop field1="@idlst,com.hele.buyer:id/name">
+			<step id="@field1" click="true" />
+		</theloop>
 	</testcase>
+	
 
 </TestCases>

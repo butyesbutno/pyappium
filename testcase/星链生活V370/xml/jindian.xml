@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <TestCases xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.6283.29081">
 
-	<testcase platform="ios-android" desc="近店主功能" version="0.1" author="michael" >
+	<testcase platform="ios-android" desc="近店主功能" version="0.1" author="kongkong" >
 		<!-- 
 			platform 
 				ios, testcase only for ios
@@ -11,10 +11,14 @@
 				true, try check every second by ten times
 				false
 			checkvalue
-				text is the same
+				=value
+				!=value
+				>value
+				<value
+				@pycode:shopLogic.valuecheck, the valuecheck supposed exist, if not, testcase get error
 			click 
 				get the element, click
-			ifexist
+			ifexist / ifnotexist
 				@xml:domethod, domethod must exist in <xmlmethod name="domethod" />
 				@pycode:shopLogic.shoptest, call pythod code at: app_logic/youappname/shopLogic.py,if the method not exist, the testcase will failed
 			method
@@ -22,7 +26,7 @@
 				@pycode:shopLogic.shoptest, call pythod code at: app_logic/youappname/shopLogic.py,if the method not exist, the testcase will failed
 		-->
 		<step id="com.hele.buyer:id/tab_near" checkexist="true" click="true" />
-		<step id="com.hele.buyer:id/abc" checkexist="false"  />
+		<step id="com.hele.buyer:id/pull_to_refresh_text" ifexist="@pycode:shopLogic.waitRefresh"  />
 		<theloop field1="@idlst,com.hele.buyer:id/shop_name">
 			<!-- 
 				field* 

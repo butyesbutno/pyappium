@@ -194,10 +194,10 @@ function showOutput(id, name) {
 
 <div class='page-header'>
 <h1>自动化测试报告</h1>
-<p class='attribute'><strong>开始时间:</strong> 2017-09-18 13:29:59</p>
-<p class='attribute'><strong>运行时长:</strong> 0:00:49.849496</p>
-<p class='attribute'><strong>机器:</strong> emulator-5554</p>
-<p class='attribute'><strong>状态:</strong> 错误 1</p>
+<p class='attribute'><strong>开始时间:</strong> 2017-09-18 21:26:44</p>
+<p class='attribute'><strong>运行时长:</strong> 0:01:02.751100</p>
+<p class='attribute'><strong>机器:</strong> 0715f7db9d353f38</p>
+<p class='attribute'><strong>状态:</strong> 通过 1 错误 1</p>
 
 </div>
 <p class='description'>用例执行情况</p>
@@ -230,45 +230,90 @@ function showOutput(id, name) {
 
 <tr class='errorClass'>
 	<td>XML 测试用例</td>
+	<td>2</td>
 	<td>1</td>
 	<td>0</td>
-	<td>0</td>
 	<td>1</td>
-	<td><a href="javascript:showClassDetail('c1',1)">详情</a></td>
+	<td><a href="javascript:showClassDetail('c1',2)">详情</a></td>
 </tr>
 
-<tr id='ft1.1' class='none'>
-	<td class='errorCase'><div class='testcase'>近店主功能</div></td>
+<tr id='pt1.1' class='hiddenRow'>
+	<td class='none'><div class='testcase'>近店主功能</div></td>
 	<td colspan='5' align='center'>
 
 	<!--css div popup start-->
-	<a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_ft1.1')" >
-		错误</a>
+	<a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.1')" >
+		通过</a>
 
-	<div id='div_ft1.1' class="popup_window">
+	<div id='div_pt1.1' class="popup_window">
 		<div style='text-align: right; color:red;cursor:pointer'>
-		<a onfocus='this.blur();' onclick="document.getElementById('div_ft1.1').style.display = 'none' " >
+		<a onfocus='this.blur();' onclick="document.getElementById('div_pt1.1').style.display = 'none' " >
 		   [x]</a>
 		</div>
 		<pre>
 		
-ft1.1: 近店主功能, write by michael, for ios-android, version 0.1
+pt1.1: 近店主功能, write by kongkong, for ios-android, version 0.1
 checkexist passed
+
+
+		</pre>
+	</div>
+	<!--css div popup end-->
+
+	</td>
+</tr>
+
+<tr id='ft1.2' class='none'>
+	<td class='errorCase'><div class='testcase'>fenlei测试</div></td>
+	<td colspan='5' align='center'>
+
+	<!--css div popup start-->
+	<a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_ft1.2')" >
+		错误</a>
+
+	<div id='div_ft1.2' class="popup_window">
+		<div style='text-align: right; color:red;cursor:pointer'>
+		<a onfocus='this.blur();' onclick="document.getElementById('div_ft1.2').style.display = 'none' " >
+		   [x]</a>
+		</div>
+		<pre>
+		
+ft1.2: fenlei测试, write by michael, for ios-android, version 0.1
 checkexist passed
-get @idlst,com.hele.buyer:id/shop_name , 3
 Loop  execute sequence 1
-evalStr=lib.shoptest(driver, element),熊琨
-进入店铺：熊琨
 Loop  execute sequence 2
-evalStr=lib.shoptest(driver, element),怡亚通官方正品店
-进入店铺：怡亚通官方正品店
 Loop  execute sequence 3
-evalStr=lib.shoptest(driver, element),倾城化妆品专营店
-进入店铺：倾城化妆品专营店
+Loop  execute sequence 4
+Loop  execute sequence 5
+Loop  execute sequence 6
+Loop  execute sequence 7
+Loop  execute sequence 8
+Loop  execute sequence 9
+Loop  execute sequence 10
+Loop  execute sequence 11
+Loop  execute sequence 12
+Loop  execute sequence 13
+Loop  execute sequence 14
+Loop  execute sequence 15
 Traceback (most recent call last):
-  File "E:\work\appiumframework\pyappium\comm\XmlParser.py", line 266, in testXml
-    if( fieldgen_no_data and len(None_fields) == 1 and None_fields[0] == None):
-TypeError: 'set' object does not support indexing
+  File "D:\kongkong\appiumframework\pyappium\comm\XmlParser.py", line 280, in testXml
+    if(self.__exe_step(driver, oneStep[j+1], fields=fields) == False):
+  File "D:\kongkong\appiumframework\pyappium\comm\XmlParser.py", line 174, in __exe_step
+    element.click()
+  File "c:\python34\lib\site-packages\selenium\webdriver\remote\webelement.py", line 78, in click
+    self._execute(Command.CLICK_ELEMENT)
+  File "c:\python34\lib\site-packages\selenium\webdriver\remote\webelement.py", line 499, in _execute
+    return self._parent.execute(command, params)
+  File "c:\python34\lib\site-packages\selenium\webdriver\remote\webdriver.py", line 297, in execute
+    self.error_handler.check_response(response)
+  File "c:\python34\lib\site-packages\appium\webdriver\errorhandler.py", line 29, in check_response
+    raise wde
+  File "c:\python34\lib\site-packages\appium\webdriver\errorhandler.py", line 24, in check_response
+    super(MobileErrorHandler, self).check_response(response)
+  File "c:\python34\lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 194, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchElementException: Message: An element could not be located on the page using the given search parameters.
+
 
 
 		</pre>
@@ -280,8 +325,8 @@ TypeError: 'set' object does not support indexing
 
 <tr id='total_row'>
 	<td>总计</td>
+	<td>2</td>
 	<td>1</td>
-	<td>0</td>
 	<td>0</td>
 	<td>1</td>
 	<td>&nbsp;</td>

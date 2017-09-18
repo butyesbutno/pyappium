@@ -2,7 +2,7 @@
 #coding: utf-8
 
 from comm import pyLib
-import time
+import time,unittest
 
 def shoptest(driver, shop):
 
@@ -21,7 +21,8 @@ def shoptest(driver, shop):
 		pass
 	driver.back()
 	time.sleep(1)
-	return find_shop_name
+
+	unittest.TestCase().assertEqual(find_shop_name, True)
 	
 def goodtest(driver, good):
 	
@@ -59,4 +60,18 @@ def goodtest(driver, good):
 	driver.back()
 	time.sleep(1)
 	
+	return True
+
+
+def waitRefresh(driver, element):
+	# wait for refresh
+	for times in range(20):
+		waitting = pyLib.getElement(driver, "com.hele.buyer:id/pull_to_refresh_text")
+		if waitting == None:
+			return True
+		time.sleep(1)
+
+	#不能一直等待
+	waitting = pyLib.getElement(driver, "com.hele.buyer:id/pull_to_refresh_text")
+	unittest.TestCase().assertEqual(waitting, None)
 	return True

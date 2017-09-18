@@ -21,7 +21,7 @@ from appium import webdriver
 from xml.etree import ElementTree
 from . import pyLib
 from config import *
-import xlrd, unittest, os, importlib
+import xlrd, unittest, os, time, importlib
 
 class _XmlTest(unittest.TestCase):
 
@@ -173,6 +173,11 @@ class _XmlTest(unittest.TestCase):
 				if click:
 					element.click()
 
+				# Just click?
+				sleep = SafeAccessStepDict("sleep")
+				if sleep:
+					time.sleep(int(sleep))
+
 				# Just execute a method
 				if method and method.startswith('@'):
 					if( self.__exe_xmlMethod(driver, element, method[1:]) == False) :
@@ -202,9 +207,9 @@ class _XmlTest(unittest.TestCase):
 				xlsdata.close()
 			elif eles[0] == "idlst":
 				elements = pyLib.getElements(driver, eles[1])
-				print("get %s , %d"%( f, len(elements)))
 				for element in elements:
 					yield element
+				raise ValueError('No data')
 		return func
 
 	def testXml(self):
@@ -261,9 +266,13 @@ class _XmlTest(unittest.TestCase):
 							fieldgen_no_data = True
 
 					# Check all fields are None
-					None_fields = set(fields)
-					if( fieldgen_no_data and len(None_fields) == 1 and None_fields[0] == None):
-						break
+					if fieldgen_no_data:
+						all_fields_none = True
+						for (k,v) in fields.items():
+							if v != None:
+								all_fields_none = False
+						if all_fields_none:
+							break
 
 					print("Loop "+ loopdesc + " execute sequence %d" % seq)
 					# execute this loop!
