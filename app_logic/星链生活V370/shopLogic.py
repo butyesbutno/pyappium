@@ -7,7 +7,7 @@ import time
 def shoptest(driver, shop):
 
 	# 此处查看店铺页面是否正常，暂空
-	print((u'进入店铺：' + shop.text + "(%s)") % (shop.location) )
+	print(u'进入店铺：' + shop.text )
 	shop.click()
 	time.sleep(5)
 	# 原生应用内的Webview须进行相应的调试声明配置

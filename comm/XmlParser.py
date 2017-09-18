@@ -21,7 +21,7 @@ from appium import webdriver
 from xml.etree import ElementTree
 from . import pyLib
 from config import *
-import xlrd, unittest, os
+import xlrd, unittest, os, importlib
 
 class _XmlTest(unittest.TestCase):
 
@@ -58,15 +58,30 @@ class _XmlTest(unittest.TestCase):
 				self._xmlmethodNode.append(step)
 
 	# check xml
-	def __exe_xmlMethod(self, driver, method_name):
+	def __exe_xmlMethod(self, driver, element, method_name):
 
-		for xmlmethod in self._xmlmethodNode:
-			if(xmlmethod.attrib["name"] != method_name):
-				continue
-			lst = xmlmethod.getchildren()
-			for n in lst:
-				if ( self.__exe_step(driver, n.attrib) == False) :
-					return False
+		# xml:domethod / pycode:shoptest
+		method_array = method_name.split(':')
+		if len(method_array) < 2 :
+			print("Xml format error - %s" % method_name)
+			return False
+
+		if method_array[0] == "xml":
+			for xmlmethod in self._xmlmethodNode:
+				if(xmlmethod.attrib["name"] != method_name):
+					continue
+				lst = xmlmethod.getchildren()
+				for n in lst:
+					if ( self.__exe_step(driver, n.attrib) == False) :
+						return False
+		elif method_array[0] == "pycode":
+			libpath = 'app_logic.' + CurAppName ;
+			libs = method_array[1].split('.')
+			for i in range(len(libs) - 1):
+				libpath += '.' + libs[i]
+			lib = importlib.import_module(libpath)
+			evalStr = "lib."+ libs[len(libs)-1] + "(driver, " + "element)"
+			eval(evalStr)
 		return True
 
 	# execute a step / return True / False
@@ -79,7 +94,13 @@ class _XmlTest(unittest.TestCase):
 				if field_translate and awd :
 					fields = awd["fields"]
 					for (k,v) in fields.items():
-						val = val.replace("@" + k, v)
+						if v == None :
+							continue
+						if type(v) == str:
+							val = val.replace("@" + k, v)
+						else:
+							if '@'+k == val :
+								return v
 				return val
 			except:
 				return None
@@ -114,30 +135,33 @@ class _XmlTest(unittest.TestCase):
 				# check the element exist
 				checkexist = SafeAccessStepDict("checkexist")
 				checkvalue = SafeAccessStepDict("checkvalue")
-				element = pyLib.tryGetElement(driver, id)
+				method = SafeAccessStepDict("method")
+				if type(id) == str :
+					element = pyLib.tryGetElement(driver, id)
+				else:
+					element = id
 				if checkexist:
 					if checkexist == "true" :
 						self.assertIsNotNone(element)
 					else:
 						self.assertIsNone(element)
-					return True
+					print("checkexist passed")
 
 				#ifexist
 				ifexist = SafeAccessStepDict("ifexist", False)
 				if ifexist and ifexist.startswith('@'):
-					if( self.__exe_xmlMethod(driver, ifexist[1:]) == False) :
+					if( self.__exe_xmlMethod(driver, element, ifexist[1:]) == False) :
 						return False
 				#ifnotexist
 				ifnotexist = SafeAccessStepDict("ifnotexist", False)
 				if ifnotexist and ifnotexist.startswith('@'):
-					if( self.__exe_xmlMethod(driver, ifnotexist[1:]) == False) :
+					if( self.__exe_xmlMethod(driver, element, ifnotexist[1:]) == False) :
 						return False
 
 				# checkvalue
 				if checkvalue:
 					real_text = element.get_attribute('text')
 					self.assertEqual(real_text, checkvalue)
-					return True
 
 				# set text?
 				text = SafeAccessStepDict("text")
@@ -149,14 +173,18 @@ class _XmlTest(unittest.TestCase):
 				if click:
 					element.click()
 
+				# Just execute a method
+				if method and method.startswith('@'):
+					if( self.__exe_xmlMethod(driver, element, method[1:]) == False) :
+						return False
 				return True
 			else:
 				return True
 
 	@staticmethod
 	def getField():
-		def func(basedir, f):
-			''' f @col:0,sheet:0,test.xls '''
+		def func(basedir, driver, f):
+			''' f @xls,col:0,sheet:0,test.xls '''
 			# if its a fixed parameters
 			if(f.startswith('@') == False):
 				while(True):
@@ -164,14 +192,19 @@ class _XmlTest(unittest.TestCase):
 
 			# its a variable
 			eles = f[1:].split(',')
-			col = int(eles[0].split(':')[1])
-			sheet = int(eles[1].split(':')[1])
-			xlsdata = xlrd.open_workbook(basedir + '/../data/'+eles[2])
-			#xlsdata = xlrd.open_workbook('E:/work/appiumframework/pyappium/data/'+eles[2])
-			table = xlsdata.sheets()[sheet]
-			for row in range(table.nrows):
-				yield table.cell(row, col).value
-			xlsdata.close()
+			if eles[0] == "xls":
+				col = int(eles[1].split(':')[1])
+				sheet = int(eles[2].split(':')[1])
+				xlsdata = xlrd.open_workbook(basedir + '/../data/'+eles[3])
+				table = xlsdata.sheets()[sheet]
+				for row in range(table.nrows):
+					yield table.cell(row, col).value
+				xlsdata.close()
+			elif eles[0] == "idlst":
+				elements = pyLib.getElements(driver, eles[1])
+				print("get %s , %d"%( f, len(elements)))
+				for element in elements:
+					yield element
 		return func
 
 	def testXml(self):
@@ -205,7 +238,7 @@ class _XmlTest(unittest.TestCase):
 							loopcount = 1
 						loop_untile_nodata = False
 					elif k.startswith('field'):
-						fieldgen[k] = _XmlTest.getField()(self._basedir, v)
+						fieldgen[k] = _XmlTest.getField()(self._basedir, driver, v)
 
 				# the loops defined correctly?
 				total_steps = len(oneStep)-1
@@ -224,11 +257,12 @@ class _XmlTest(unittest.TestCase):
 						try:
 							fields[k] = pyLib.generatorGetNext(v)
 						except BaseException as e:
-							fields[k] = ""
+							fields[k] = None
 							fieldgen_no_data = True
 
-					# Has no data?
-					if loop_untile_nodata and fieldgen_no_data:
+					# Check all fields are None
+					None_fields = set(fields)
+					if( fieldgen_no_data and len(None_fields) == 1 and None_fields[0] == None):
 						break
 
 					print("Loop "+ loopdesc + " execute sequence %d" % seq)
@@ -237,6 +271,10 @@ class _XmlTest(unittest.TestCase):
 						if(self.__exe_step(driver, oneStep[j+1], fields=fields) == False):
 							driver.quit()
 							return False
+
+					# Has no data?
+					if loop_untile_nodata and fieldgen_no_data:
+						break
 
 					if loop_untile_nodata == False and seq >= loopcount:
 						break

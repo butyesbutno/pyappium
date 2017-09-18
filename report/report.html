@@ -194,10 +194,10 @@ function showOutput(id, name) {
 
 <div class='page-header'>
 <h1>自动化测试报告</h1>
-<p class='attribute'><strong>开始时间:</strong> 2017-09-17 22:11:31</p>
-<p class='attribute'><strong>运行时长:</strong> 0:01:12.384571</p>
-<p class='attribute'><strong>机器:</strong> 0715f7db9d353f38</p>
-<p class='attribute'><strong>状态:</strong> 通过 1</p>
+<p class='attribute'><strong>开始时间:</strong> 2017-09-18 13:29:59</p>
+<p class='attribute'><strong>运行时长:</strong> 0:00:49.849496</p>
+<p class='attribute'><strong>机器:</strong> emulator-5554</p>
+<p class='attribute'><strong>状态:</strong> 错误 1</p>
 
 </div>
 <p class='description'>用例执行情况</p>
@@ -228,36 +228,47 @@ function showOutput(id, name) {
 	<td>查看</td>
 </tr>
 
-<tr class='passClass'>
+<tr class='errorClass'>
 	<td>XML 测试用例</td>
 	<td>1</td>
+	<td>0</td>
+	<td>0</td>
 	<td>1</td>
-	<td>0</td>
-	<td>0</td>
 	<td><a href="javascript:showClassDetail('c1',1)">详情</a></td>
 </tr>
 
-<tr id='pt1.1' class='hiddenRow'>
-	<td class='none'><div class='testcase'>登录测试</div></td>
+<tr id='ft1.1' class='none'>
+	<td class='errorCase'><div class='testcase'>近店主功能</div></td>
 	<td colspan='5' align='center'>
 
 	<!--css div popup start-->
-	<a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.1')" >
-		通过</a>
+	<a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_ft1.1')" >
+		错误</a>
 
-	<div id='div_pt1.1' class="popup_window">
+	<div id='div_ft1.1' class="popup_window">
 		<div style='text-align: right; color:red;cursor:pointer'>
-		<a onfocus='this.blur();' onclick="document.getElementById('div_pt1.1').style.display = 'none' " >
+		<a onfocus='this.blur();' onclick="document.getElementById('div_ft1.1').style.display = 'none' " >
 		   [x]</a>
 		</div>
 		<pre>
 		
-pt1.1: 登录测试, write by michael, for ios-android, version 0.1
+ft1.1: 近店主功能, write by michael, for ios-android, version 0.1
+checkexist passed
+checkexist passed
+get @idlst,com.hele.buyer:id/shop_name , 3
 Loop  execute sequence 1
-输入用户名：18938884424,密码:kong1121K,成功：true
+evalStr=lib.shoptest(driver, element),熊琨
+进入店铺：熊琨
 Loop  execute sequence 2
-输入用户名：18938884424,密码:pw2sdafdsaf,成功：false
+evalStr=lib.shoptest(driver, element),怡亚通官方正品店
+进入店铺：怡亚通官方正品店
 Loop  execute sequence 3
+evalStr=lib.shoptest(driver, element),倾城化妆品专营店
+进入店铺：倾城化妆品专营店
+Traceback (most recent call last):
+  File "E:\work\appiumframework\pyappium\comm\XmlParser.py", line 266, in testXml
+    if( fieldgen_no_data and len(None_fields) == 1 and None_fields[0] == None):
+TypeError: 'set' object does not support indexing
 
 
 		</pre>
@@ -270,9 +281,9 @@ Loop  execute sequence 3
 <tr id='total_row'>
 	<td>总计</td>
 	<td>1</td>
+	<td>0</td>
+	<td>0</td>
 	<td>1</td>
-	<td>0</td>
-	<td>0</td>
 	<td>&nbsp;</td>
 </tr>
 </table>
