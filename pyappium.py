@@ -15,7 +15,7 @@
 # limitations under the License.
 # email: michael.wangh@gmail.com
 
-import os,sys,unittest,subprocess,datetime
+import os,sys,unittest,datetime
 import argparse
 from comm import *
 from config import *
@@ -48,13 +48,9 @@ if __name__ == "__main__":
 
 	# 获取当前正在链接的设备 / the connected mobile phone
 	if deviceName == None :
-		subp = subprocess.Popen('adb devices',shell=True,stdout=subprocess.PIPE)
-		l = subp.stdout.readline()
-		l = subp.stdout.readline()
-		if l and len(l) > 2:
-			list = l.split(b'\t')
-			deviceName = list[0].decode('utf-8')
-		subp.wait()
+		devlst = pyLib.getConnectDevices()
+		if(len(devlst) >0):
+			deviceName = devlst[0]
 	if deviceName == None :
 		print(u"当前没有设备链接")
 		exit(0)

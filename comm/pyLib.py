@@ -16,7 +16,7 @@
 
 from appium.webdriver.mobilecommand import MobileCommand
 from xml.etree import ElementTree
-import time,sys,os,unittest
+import time,sys,os,unittest,subprocess
 
 __author__ = "Michael Wang"
 __version__ = "0.1.0"
@@ -30,6 +30,21 @@ def switch_app(driver):
 	driver.execute(MobileCommand.SWITCH_TO_CONTEXT, {"name": "NATIVE_APP"})
 def switch_context(driver):
 	driver.execute(MobileCommand.SWITCH_TO_CONTEXT, {"name": webview_content})
+
+# 获取
+def getConnectDevices():
+	devlst = []
+	subp = subprocess.Popen('adb devices',shell=True,stdout=subprocess.PIPE)
+	l = subp.stdout.readline()
+	while True:
+		l = subp.stdout.readline().decode('utf-8')
+		if l == None or len(l) == 0:
+			break
+		if len(l) > 2 and l.startswith('*') == False:
+			list = l.split('\t')
+			devlst.append( list[0] )
+	subp.wait()
+	return devlst
 
 # find_element_by_id may throw exception
 def getElement(driver, resId):

@@ -152,17 +152,18 @@ class _XmlTestProtoType(unittest.TestCase):
 					element = pyLib.tryGetElementByName(self.driver, v)
 				else:
 					element = translated_v
-			elif k == "screensnapshot":
-				filepath = self._basedir + 'screenshot/' +  CurAppName + "/"
+			elif k == "screenshot":
+				filepath = self._basedir + '/../screenshot/' +  CurAppName + "/"
 				try:
-					os.mkdir(reportpath)
+					os.mkdir(filepath)
 				except:
 					pass
 				filepath += v + "_%d.png" % int(time.strftime("%Y%m%d%H%M"))
+				print(filepath)
 				self.driver.get_screenshot_as_file(filepath)
 			elif k == "swipe":
 				# swipe="2/3,1/3,1/3,1/3,1000"
-				lst = swipe.split(',')
+				lst = v.split(',')
 				try:
 					pyLib.swipeRelative(self.driver, float(lst[0]), float(lst[1]), float(lst[2]), float(lst[3]), int(lst[4]))
 				except:
@@ -341,21 +342,12 @@ def makeXmlSuite(xml_testcases):
 	return unittest.makeSuite(_XmlTestProtoType)
 
 def getXmlTestcaseDesc(name):
-	return getattr(_XmlTestProtoType, name+'xmldoc')
+	try:
+		return getattr(_XmlTestProtoType, name+'xmldoc')
+	except:
+		return None
 
 # properties of all
 __all__=["makeXmlSuite", "getXmlTestcaseDesc"]
 
-if __name__ == '__main__':
-	'''''读xml文件'''
-	# 加载XML文件（2种方法,一是加载指定字符串，二是加载指定文件）
-	root = ElementTree.parse("D:/kongkong/appiumframework/pyappium/testcase/星链生活V370/xml/test.xml")
-	testcases = root.findall("testcase")
 
-	i = 0
-	suit = unittest.TestSuite()
-	for testcaseNode in testcases:
-		a = _XmlTest(testcaseNode)
-		setattr(_XmlTestProtoType, "test" + str(i), a.testXml())
-		suit.addTests(unittest.makeSuite(_XmlTestProtoType))
-	unittest.TextTestRunner().run(suit)

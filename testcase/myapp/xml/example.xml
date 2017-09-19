@@ -34,6 +34,8 @@
 				will be executed without preconditions / 无条件执行
 				@xml:domethod, domethod must exist in <xmlmethod name="domethod" />
 				@pycode:shopLogic.shoptest, call pythod code at: app_logic/youappname/shopLogic.py,if the method not exist, the testcase will failed
+			screenshot
+			swipe
 		-->
 		<step id="com.XXX:id/tab_near" checkexist="true" click="true" />
 		<step id="com.XXX:id/refresh_text" ifexist="@pycode:shopLogic.waitRefresh"  />
@@ -49,6 +51,8 @@
 			-->		
 			<step id="@field1" method="@pycode:shopLogic.shoptest" />
 		</theloop>
+		<step index="2" screenshot="文件前缀" />
+		<step index="3" swipe="1/2,2/3,1/2,1/3,1000" />		
 	</testcase1>
 
 </TestCases>
