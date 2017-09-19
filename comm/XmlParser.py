@@ -23,14 +23,35 @@ from . import pyLib
 from config import *
 import xlrd, unittest, os, time, importlib
 
-class _XmlTest(unittest.TestCase):
+class _XmlTestProtoType(unittest.TestCase):
+	'''XML 测试用例'''
 
-	def __init__(self, testcaseNode):
+	# 测试准备
+	def setUp(self):
+		# appium & 启动app/activity
+		self.driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', desired_caps)
 
+	# 测试结束
+	def tearDown(self):
+		self.driver.quit()
+
+	# 初始化
+	def __init__(self, methodName='runTest'):
+
+		super(_XmlTestProtoType, self).__init__(methodName)
+		
 		# base dir
 		# ../report ../screenshot
 		self._basedir = os.path.dirname(os.path.abspath(__file__))
 
+		# save the parameters
+		self._xmlmethodNode = []
+
+		# testcase's step
+		self._step = []
+
+	# Load testcase format xml
+	def _loadTestcase(self, testcaseNode):
 		# save the parameters
 		self._xmlmethodNode = []
 
@@ -58,7 +79,7 @@ class _XmlTest(unittest.TestCase):
 				self._xmlmethodNode.append(step)
 
 	# check xml
-	def __exe_xmlMethod(self, driver, element, method_name):
+	def _exe_xmlMethod(self, element, method_name):
 
 		# xml:domethod / pycode:shoptest
 		method_array = method_name.split(':')
@@ -72,7 +93,7 @@ class _XmlTest(unittest.TestCase):
 					continue
 				lst = xmlmethod.getchildren()
 				for n in lst:
-					if ( self.__exe_step(driver, n.attrib) == False) :
+					if ( self.__exe_step( n.attrib) == False) :
 						return False
 		elif method_array[0] == "pycode":
 			libpath = 'app_logic.' + CurAppName ;
@@ -80,12 +101,12 @@ class _XmlTest(unittest.TestCase):
 			for i in range(len(libs) - 1):
 				libpath += '.' + libs[i]
 			lib = importlib.import_module(libpath)
-			evalStr = "lib."+ libs[len(libs)-1] + "(driver, " + "element)"
+			evalStr = "lib."+ libs[len(libs)-1] + "(self.driver, " + "element)"
 			eval(evalStr)
 		return True
 
 	# execute a step / return True / False
-	def __exe_step(self, driver, oneStep, *args, **awd):
+	def _exe_step(self, oneStep, *args, **awd):
 
 		# No exception when access dict
 		def SafeAccessStepDict(key, field_translate=True):
@@ -105,114 +126,91 @@ class _XmlTest(unittest.TestCase):
 			except:
 				return None
 
-		# step desc
-		desc = SafeAccessStepDict("desc")
-		if desc != None:
-			print(desc)
-
 		# try execute this step
-		h5 = SafeAccessStepDict("h5")
-		if h5 and h5 == "true":
-			xpath = SafeAccessStepDict("xpath")
-			pass
-		else:
-			id = SafeAccessStepDict("id")
-			screensnapshot = SafeAccessStepDict("screensnapshot")
-			swipe = SafeAccessStepDict("swipe")
-			if screensnapshot:
-				filepath = self._basedir + 'screenshot/' +  "Error_%d.png" % int(time.strftime("%Y%m%d%H%M"))
-				driver.get_screenshot_as_file(filepath)
-				return True
-			if swipe:
+		for (k,v) in oneStep.items():
+			translated_v = SafeAccessStepDict(k)
+			if k == "desc":
+				print(translated_v)
+				continue
+			if k == "index":
+				print(u"XML步骤(%s)正在执行" % v)
+				continue
+			if k == "h5" and len(translated_v) > 0:
+				pyLib.switch_context(translated_v)
+			if k == "id":
+				if type(translated_v) == str :
+					element = pyLib.tryGetElement(self.driver, v)
+				else:
+					element = translated_v
+			elif k == "xpath":
+				if type(translated_v) == str :
+					element = pyLib.tryGetElementByXPath(self.driver, v)
+				else:
+					element = translated_v
+			elif k == "name":
+				if type(translated_v) == str :
+					element = pyLib.tryGetElementByName(self.driver, v)
+				else:
+					element = translated_v
+			elif k == "screensnapshot":
+				filepath = self._basedir + 'screenshot/' +  CurAppName + "/"
+				try:
+					os.mkdir(reportpath)
+				except:
+					pass
+				filepath += v + "_%d.png" % int(time.strftime("%Y%m%d%H%M"))
+				self.driver.get_screenshot_as_file(filepath)
+			elif k == "swipe":
 				# swipe="2/3,1/3,1/3,1/3,1000"
 				lst = swipe.split(',')
 				try:
-					pyLib.swipeRelative(driver, float(lst[0]), float(lst[1]), float(lst[2]), float(lst[3]), int(lst[4]))
+					pyLib.swipeRelative(self.driver, float(lst[0]), float(lst[1]), float(lst[2]), float(lst[3]), int(lst[4]))
 				except:
-					return False
-				return True
-			if id:
+					pass
+			elif k == "checkexist":
 				# check the element exist
-				checkexist = SafeAccessStepDict("checkexist")
-				checkvalue = SafeAccessStepDict("checkvalue")
-				method = SafeAccessStepDict("method")
-				if type(id) == str :
-					element = pyLib.tryGetElement(driver, id)
+				if translated_v == "true" :
+					self.assertIsNotNone(element)
 				else:
-					element = id
-				if checkexist:
-					if checkexist == "true" :
-						self.assertIsNotNone(element)
-					else:
-						self.assertIsNone(element)
-					print("checkexist passed")
+					self.assertIsNone(element)
+			elif k == "checkvalue":
+				real_text = element.get_attribute('text')
+				if(translated_v[0] == '='):
+					self.assertEqual(real_text, translated_v[1:])
+				if(translated_v[0] == '!' and translated_v[1] == '='):
+					self.assertNotEqual(real_text, translated_v[2:])
+				if v.startswith('@'):
+					self._exe_xmlMethod(element, v[1:])
 
+			elif k == "ifexist":
 				#ifexist
-				ifexist = SafeAccessStepDict("ifexist", False)
-				if ifexist and ifexist.startswith('@'):
-					if( self.__exe_xmlMethod(driver, element, ifexist[1:]) == False) :
-						return False
+				if element != None and v.startswith('@'):
+					self._exe_xmlMethod(element, v[1:])
+
+			elif k == "ifnotexist":
 				#ifnotexist
-				ifnotexist = SafeAccessStepDict("ifnotexist", False)
-				if ifnotexist and ifnotexist.startswith('@'):
-					if( self.__exe_xmlMethod(driver, element, ifnotexist[1:]) == False) :
-						return False
+				if element == None and v.startswith('@'):
+					self._exe_xmlMethod(element, v[1:])
 
-				# checkvalue
-				if checkvalue:
-					real_text = element.get_attribute('text')
-					self.assertEqual(real_text, checkvalue)
-
+			elif k == "text":
 				# set text?
-				text = SafeAccessStepDict("text")
-				if text:
-					pyLib.setTextValue(element, text)
+				pyLib.setTextValue(element, translated_v)
 
+			elif k == "click":
 				# Just click?
-				click = SafeAccessStepDict("click")
-				if click:
-					element.click()
+				element.click()
 
+			elif k == "sleep":
 				# Just click?
-				sleep = SafeAccessStepDict("sleep")
-				if sleep:
-					time.sleep(int(sleep))
+				time.sleep(int(translated_v))
 
+			elif k == "method":
 				# Just execute a method
-				if method and method.startswith('@'):
-					if( self.__exe_xmlMethod(driver, element, method[1:]) == False) :
-						return False
-				return True
-			else:
-				return True
+				if v.startswith('@'):
+					self._exe_xmlMethod(element, v[1:])
 
-	@staticmethod
-	def getField():
-		def func(basedir, driver, f):
-			''' f @xls,col:0,sheet:0,test.xls '''
-			# if its a fixed parameters
-			if(f.startswith('@') == False):
-				while(True):
-					yield f
-
-			# its a variable
-			eles = f[1:].split(',')
-			if eles[0] == "xls":
-				col = int(eles[1].split(':')[1])
-				sheet = int(eles[2].split(':')[1])
-				xlsdata = xlrd.open_workbook(basedir + '/../data/'+eles[3])
-				table = xlsdata.sheets()[sheet]
-				for row in range(table.nrows):
-					yield table.cell(row, col).value
-				xlsdata.close()
-			elif eles[0] == "idlst":
-				elements = pyLib.getElements(driver, eles[1])
-				for element in elements:
-					yield element
-				raise ValueError('No data')
-		return func
-
-	def testXml(self):
+	# 执行测试用例
+	def _exe_testcase(self):
 		'''Execute the test case'''
 
 		# testcase informations
@@ -222,9 +220,6 @@ class _XmlTest(unittest.TestCase):
 		version = getattr(self, "version", "")
 		loopcount = getattr(self, "loopcount", "")
 		print(desc + ', write by ' + author + ', for ' + platform + ', version ' + version)
-
-		# webdriver
-		driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', desired_caps)
 
 		# execute the testcase
 		for oneStep in self._step:
@@ -243,7 +238,7 @@ class _XmlTest(unittest.TestCase):
 							loopcount = 1
 						loop_untile_nodata = False
 					elif k.startswith('field'):
-						fieldgen[k] = _XmlTest.getField()(self._basedir, driver, v)
+						fieldgen[k] = _XmlTestProtoType.getField()(self._basedir, self.driver, v)
 
 				# the loops defined correctly?
 				total_steps = len(oneStep)-1
@@ -277,9 +272,7 @@ class _XmlTest(unittest.TestCase):
 					print("Loop "+ loopdesc + " execute sequence %d" % seq)
 					# execute this loop!
 					for j in range(total_steps):
-						if(self.__exe_step(driver, oneStep[j+1], fields=fields) == False):
-							driver.quit()
-							return False
+						self._exe_step(oneStep[j+1], fields=fields)
 
 					# Has no data?
 					if loop_untile_nodata and fieldgen_no_data:
@@ -289,14 +282,42 @@ class _XmlTest(unittest.TestCase):
 						break
 					seq = seq + 1
 			else:
-				if (self.__exe_step(driver, oneStep) == False) :
-					driver.quit()
-					return False
-		driver.quit()
+				self._exe_step(oneStep)
 
-class _XmlTestProtoType(unittest.TestCase):
-	'''XML 测试用例'''
-	pass
+	# generator of any parameter start with @
+	@staticmethod
+	def getField():
+		def func(basedir, driver, f):
+			''' f @xls,col:0,sheet:0,test.xls '''
+			# if its a fixed parameters
+			if(f.startswith('@') == False):
+				while(True):
+					yield f
+
+			# its a variable
+			eles = f[1:].split(',')
+			if eles[0] == "xls":
+				col = int(eles[1].split(':')[1])
+				sheet = int(eles[2].split(':')[1])
+				xlsdata = xlrd.open_workbook(basedir + '/../data/'+eles[3])
+				table = xlsdata.sheets()[sheet]
+				for row in range(table.nrows):
+					yield table.cell(row, col).value
+				xlsdata.close()
+			elif eles[0] == "idlst":
+				elements = pyLib.getElements(driver, eles[1])
+				for element in elements:
+					yield element
+				raise ValueError('No data')
+		return func
+
+	# testcase prototype
+	@staticmethod
+	def newTestCase(testcaseNode):
+		def func(self):
+			self._loadTestcase(testcaseNode)
+			self._exe_testcase()
+		return func
 
 # 为xml形式的testcase构建unittest形式的用例
 def makeXmlSuite(xml_testcases):
@@ -308,13 +329,14 @@ def makeXmlSuite(xml_testcases):
 			testcases = root.findall("testcase")
 
 			for testcaseNode in testcases:
-				setattr(_XmlTestProtoType, "test" + str(funNumber), _XmlTest(testcaseNode).testXml)
+				setattr(_XmlTestProtoType, "test" + str(funNumber), _XmlTestProtoType.newTestCase(testcaseNode))
 				try:
 					setattr(_XmlTestProtoType, "test" + str(funNumber)+'xmldoc', testcaseNode.attrib["desc"])
 				except:
 					pass
 				funNumber = funNumber + 1
-		except:
+		except BaseException as e:
+			print(e)
 			print("Xml file %s has error" % filename)
 	return unittest.makeSuite(_XmlTestProtoType)
 

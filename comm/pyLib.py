@@ -28,6 +28,8 @@ def switch_h5(driver, webview_content):
 	driver.execute(MobileCommand.SWITCH_TO_CONTEXT, {"name": webview_content})
 def switch_app(driver):
 	driver.execute(MobileCommand.SWITCH_TO_CONTEXT, {"name": "NATIVE_APP"})
+def switch_context(driver):
+	driver.execute(MobileCommand.SWITCH_TO_CONTEXT, {"name": webview_content})
 
 # find_element_by_id may throw exception
 def getElement(driver, resId):
@@ -62,12 +64,31 @@ def getElementByXPath(driver, inxpath):
 	except:
 		return None
 
-# try find element list, waitting for
+# try find element xpath, waitting for
 def tryGetElementByXPath(driver, inxpath, waittingsecond=10):
 	if (waittingsecond<1):
 		waittingsecond = 1
 	for i in range(waittingsecond):
 		ele = getElementByXPath(driver, inxpath)
+		if ele:
+			return ele
+		else:
+			time.sleep(1)
+	return None
+
+# find_element_by_name
+def getElementByName(driver, inname):
+	try:
+		return driver.find_element_by_name(inname)
+	except:
+		return None
+
+# try find element name, waitting for
+def tryGetElementByName(driver, inname, waittingsecond=10):
+	if (waittingsecond<1):
+		waittingsecond = 1
+	for i in range(waittingsecond):
+		ele = getElementByName(driver, inname)
 		if ele:
 			return ele
 		else:

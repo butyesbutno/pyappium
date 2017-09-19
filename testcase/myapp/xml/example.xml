@@ -1,37 +1,47 @@
 <?xml version="1.0"?>
 <TestCases xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.6283.29081">
 
-	<testcase platform="ios-android" desc="近店主功能" version="0.1" author="kongkong" >
+	<testcase1 platform="ios-android" desc="主功能" version="0.1" author="michael" >
 		<!-- 
+			all elements's atributes has no order, so:
+			XML所有元素的属性没有顺序，所有如下写法
+				<step id="com.XXX:id/tab" checkexist="true" />
+				<step id="com.XXX:id/tab" click="true" />
+				better than:
+				要比这个好：
+				<step id="com.XXX:id/tab" checkexist="true" click="true" />
 			platform 
 				ios, testcase only for ios
 				android, testcase only for android
 				ios-android, both
+			id, xpath, name
+				find_element_by_id / xpath / name
 			checkexist
-				true, try check every second by ten times
+				true, assert element exist. try check every second by ten times
 				false
 			checkvalue
-				=value
-				!=value
-				>value
-				<value
+				=value, assert element's text value equal value
+				!=value, assert element's text value not equal value
 				@pycode:shopLogic.valuecheck, the valuecheck supposed exist, if not, testcase get error
 			click 
 				get the element, click
+				if the element not exist, testcase gets error
 			ifexist / ifnotexist
+				will be executed with preconditions / 条件执行
 				@xml:domethod, domethod must exist in <xmlmethod name="domethod" />
 				@pycode:shopLogic.shoptest, call pythod code at: app_logic/youappname/shopLogic.py,if the method not exist, the testcase will failed
 			method
+				will be executed without preconditions / 无条件执行
 				@xml:domethod, domethod must exist in <xmlmethod name="domethod" />
 				@pycode:shopLogic.shoptest, call pythod code at: app_logic/youappname/shopLogic.py,if the method not exist, the testcase will failed
 		-->
-		<step id="com.hele.buyer:id/tab_near" checkexist="true" click="true" />
-		<step id="com.hele.buyer:id/pull_to_refresh_text" ifexist="@pycode:shopLogic.waitRefresh"  />
-		<theloop field1="@idlst,com.hele.buyer:id/shop_name">
+		<step id="com.XXX:id/tab_near" checkexist="true" click="true" />
+		<step id="com.XXX:id/refresh_text" ifexist="@pycode:shopLogic.waitRefresh"  />
+		<theloop field1="@idlst,com.XXX:id/shopname">
 			<!-- 
 				field* 
 					"@xls,col:0,sheet:0,test.xls", fetch from test.xls every loop
-					"@ldlst,com.hele.buyer:id/shop_name", foreach for id list
+					"@ldlst,com.XXX:id/shop_name", foreach for id list
 					"unchanged", the parameter not changed every loop
 				loopcount
 					if all field* is unchanged parameter, then execute loopcount times
@@ -39,6 +49,6 @@
 			-->		
 			<step id="@field1" method="@pycode:shopLogic.shoptest" />
 		</theloop>
-	</testcase>
+	</testcase1>
 
 </TestCases>

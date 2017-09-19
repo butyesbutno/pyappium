@@ -15,28 +15,8 @@
 # limitations under the License.
 # email: michael.wangh@gmail.com
 
-"""python app test framework
-
-Usage:
-	pyappium (-h | --help)
-	pyappium [<desc>] [<title>]
-	pyappium [<desc>] [<title>] -r <remove_suite> -d <deviceName> -a <appName>
-	pyappium -r <remove_suite>
-	pyappium -d <deviceName>
-	pyappium -a <appName>
-	
-Options:
-	-h,--help   显示帮助菜单
-	-r,--remove 移除特定目录下用例 login,h5移除login,h5目录的测试
-	-d,--device 设置所链接的真机，不设置将自动检测
-	-a,--app    app文件名，位于apps/
-
-Example:
-	pyappium 
-	pyappium 自动化测试报告 用例执行情况 
-	pyappium -r login,h5
-"""
 import os,sys,unittest,subprocess,datetime
+import argparse
 from comm import *
 from config import *
 from docopt import docopt
@@ -48,20 +28,21 @@ __version__ = "0.1.0"
 if __name__ == "__main__":
 	
 	# 获取命令行参数 / obtain the commandline parameters
-	if sys.version_info.major > 2:
-		arguments = docopt(__doc__)
-	else:
-		arguments = docopt(__doc__.decode('utf8'))
-	title = arguments.get('<title>')
-	description = arguments.get('<desc>')
-	deviceName = arguments.get('<deviceName>')
-	appName = arguments.get('<appName>')
-	remove_suite = arguments.get('<remove_suite>')
+	ap = argparse.ArgumentParser()
+	ap.add_argument("-r", "--remove_suite", required = False,
+	help = "Specify removed testsuit")
+	ap.add_argument("-d", "--device", required = False,
+	help = "Specify device name(if not, auto detect)")
+	ap.add_argument("-a", "--app", required = False,
+	help = "Install app file name")
+	args = vars(ap.parse_args())
+
+	title = u'自动化测试报告'
+	description = u'用例执行情况'
+	deviceName = args['device']
+	appName = args['app']
+	remove_suite = args['remove_suite']
 	remove_suite_list = None
-	if title == None:
-		title = u'自动化测试报告'
-	if description == None:
-		description = u'用例执行情况'
 	if remove_suite != None:
 		remove_suite_list = remove_suite.split(',')
 

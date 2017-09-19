@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<TestCases xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.6283.29081">
+
+	<testcase platform="ios-android" desc="登录测试" version="0.1" author="michael" >
+		<!-- 
+			platform = ios / android / ios-android
+		-->
+		<step index="1" id="com.xxx:id/login" checkexist="true"  />
+		<theloop field1="@xls,col:0,sheet:0,test.xls" field2="@xls,col:1,sheet:0,test.xls"  field3="@xls,col:2,sheet:0,test.xls" loopcount="1" >
+			<!-- 
+				field* 
+					"@xls,col:0,sheet:0,test.xls", fetch from test.xls every loop
+					"@ldlst,com.XXX:id/shop_name", foreach for id list
+					"unchanged", the parameter not changed every loop
+				loopcount
+					if all field* is unchanged parameter, then execute loopcount times
+					if any field* is mutable parameter, loop until to field* failed
+			-->
+			<step index="3" id="com.XXX:id/username" ifexist="@xml:logout" />
+			<step index="4" id="com.XXX:id/pwd" text="@field2" desc="输入用户名：@field1,密码:@field2,预期成功：@field3" />
+			<step index="5" id="com.XXX:id/phone" text="@field1" />
+			<step index="6" id="com.XXX:id/login" click="true" />
+			<step index="7" id="com.XXX:id/username" checkexist="@field3" />
+			<step index="8" desc="该组用户名密码测试通过" />
+		</theloop>
+		<xmlmethod name="logout">
+			<step index="9" id="com.XXX:id/username" click="true" />
+			<step index="10" id="com.XXX:id/login_out" click="true" />
+			<step index="11" id="com.XXX:id/right" click="true" />
+			<step index="12" id="com.XXX:id/login" click="true" />
+		</xmlmethod>
+	</testcase>
+	
+    <testcase platform="ios-android" desc="测试" version="0.1" author="michael" >
+		<step index="1" id="com.XXX:id/tab_goods" checkexist="true"  />
+		<step index="2" id="com.XXX:id/tab_goods" click="true" sleep="2" />
+		<theloop field1="@idlst,com.XXX:id/name">
+			<step index="3" id="@field1" click="true" />
+		</theloop>
+	</testcase>
+
+</TestCases>
