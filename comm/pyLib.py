@@ -31,8 +31,8 @@ def switch_app(driver):
 def switch_context(driver):
 	driver.execute(MobileCommand.SWITCH_TO_CONTEXT, {"name": webview_content})
 
-# 获取
-def getConnectDevices():
+# 获取相连的安卓机器名称
+def getConnectAndroidDevices():
 	devlst = []
 	subp = subprocess.Popen('adb devices',shell=True,stdout=subprocess.PIPE)
 	l = subp.stdout.readline()
@@ -45,6 +45,25 @@ def getConnectDevices():
 			devlst.append( list[0] )
 	subp.wait()
 	return devlst
+
+# 获取相连的安卓机器品牌/型号
+def getAndroidDevProp(deviceName):
+	brandAndModelStr = ""
+	subp = subprocess.Popen( 'adb -s ' + deviceName + ' shell getprop | findstr product',shell=True,stdout=subprocess.PIPE)
+	l = subp.stdout.readline()
+	while True:
+		l = subp.stdout.readline().decode('utf-8')
+		if l == None or len(l) == 0:
+			break
+
+		if l.startswith('[ro.product.brand]') :
+			brandAndModelStr += l.split(':')[1]
+		if l.startswith('[ro.product.model]') :
+			brandAndModelStr += l.split(':')[1]
+	subp.wait()
+	brandAndModelStr = brandAndModelStr.replace('\r', '')
+	brandAndModelStr = brandAndModelStr.replace('\n', '')
+	return brandAndModelStr
 
 # find_element_by_id may throw exception
 def getElement(driver, resId):
@@ -189,11 +208,21 @@ def walkXmlFiles(rootDir, exclude_relative_path_list):
 	xmllst = []
 	for root,dirs,files in os.walk(rootDir):
 		for file in files:
-			if(file.lower().endswith('.xml')):
-				xmllst.append(os.path.join(root,file))
-		for dir in dirs:
-			if exclude_relative_path_list!=None and exclude_relative_path_list.index(dir) >= 0:
+
+			if(file.lower().endswith('.xml') == False):
+				continue
+
+			if exclude_relative_path_list!=None :
+				suite_not_include = False
+				for exclude_path in exclude_relative_path_list:
+					if file == exclude_path :
+						suite_not_include = True
+						break
+				if suite_not_include :
 					continue
+
+			xmllst.append(os.path.join(root,file))
+		for dir in dirs:
 			lst = walkXmlFiles(dir, exclude_relative_path_list)
 			if lst is not None:
 				xmllst += lst
@@ -209,10 +238,18 @@ def walkPyFiles(rootDir, exclude_relative_path_list):
 				continue
 			if(file.lower().endswith('.py') == False):
 				continue
+
+			if exclude_relative_path_list!=None :
+				suite_not_include = False
+				for exclude_path in exclude_relative_path_list:
+					if file == exclude_path :
+						suite_not_include = True
+						break
+				if suite_not_include :
+					continue
+
 			pylst.append(os.path.join(root,file))
 		for dir in dirs:
-			if exclude_relative_path_list!=None and exclude_relative_path_list.index(dir) >= 0:
-					continue
 			lst = walkPyFiles(dir, exclude_relative_path_list)
 			if lst is not None:
 				pylst += lst

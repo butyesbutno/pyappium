@@ -11,6 +11,7 @@
 				field* 
 					"@xls,col:0,sheet:0,test.xls", fetch from test.xls every loop
 					"@ldlst,com.XXX:id/shop_name", foreach for id list
+					"@xpathlst,//android.widget.TextView[@index=0]", foreach for xpath list
 					"unchanged", the parameter not changed every loop
 				loopcount
 					if all field* is unchanged parameter, then execute loopcount times
@@ -32,8 +33,7 @@
 	</testcase>
 	
     <testcase platform="ios-android" desc="测试" version="0.1" author="michael" >
-		<step index="1" id="com.XXX:id/tab_goods" checkexist="true"  />
-		<step index="2" id="com.XXX:id/tab_goods" click="true" sleep="2" />
+		<step index="1" id="com.XXX:id/xxx" checkexist="true"  />
 		<theloop field1="@idlst,com.XXX:id/name">
 			<step index="3" id="@field1" click="true" />
 		</theloop>

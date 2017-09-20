@@ -29,7 +29,7 @@ class _XmlTestProtoType(unittest.TestCase):
 	# 测试准备
 	def setUp(self):
 		# appium & 启动app/activity
-		self.driver = webdriver.Remote('http://127.0.0.1:4723/wd/hub', desired_caps)
+		self.driver = webdriver.Remote(AppiumServer, desired_caps)
 
 	# 测试结束
 	def tearDown(self):
@@ -127,6 +127,8 @@ class _XmlTestProtoType(unittest.TestCase):
 				return None
 
 		# try execute this step
+		# first find the element
+		element = None
 		for (k,v) in oneStep.items():
 			translated_v = SafeAccessStepDict(k)
 			if k == "desc":
@@ -152,7 +154,11 @@ class _XmlTestProtoType(unittest.TestCase):
 					element = pyLib.tryGetElementByName(self.driver, v)
 				else:
 					element = translated_v
-			elif k == "screenshot":
+
+		# step's attributes
+		for (k,v) in oneStep.items():
+			translated_v = SafeAccessStepDict(k)
+			if k == "screenshot":
 				filepath = self._basedir + '/../screenshot/' +  CurAppName + "/"
 				try:
 					os.mkdir(filepath)
@@ -307,6 +313,11 @@ class _XmlTestProtoType(unittest.TestCase):
 				xlsdata.close()
 			elif eles[0] == "idlst":
 				elements = pyLib.getElements(driver, eles[1])
+				for element in elements:
+					yield element
+				raise ValueError('No data')
+			elif eles[0] == "xpathlst":
+				elements = driver.find_elements_by_xpath(eles[1])
 				for element in elements:
 					yield element
 				raise ValueError('No data')
