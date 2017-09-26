@@ -259,6 +259,7 @@ def walkPyFiles(rootDir, exclude_relative_path_list):
 # 遍历目录下所有json类型目录
 def walkJsonFiles(rootDir):
 	jsonlst = []
+
 	for root,dirs,files in os.walk(rootDir):
 		for file in files:
 
@@ -268,6 +269,7 @@ def walkJsonFiles(rootDir):
 			jsonlst.append(root)
 			break
 		for dir in dirs:
+
 			lst = walkJsonFiles(dir)
 			if lst is not None:
 				jsonlst += lst

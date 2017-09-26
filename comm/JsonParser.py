@@ -22,7 +22,7 @@ from config import *
 from . import mysqldb
 
 class _JsonTestProtoType(unittest.TestCase):
-	'''JSON 测试用例'''
+	'''JSON 接口测试'''
 
 	# testcase prepare
 	def setUp(self):
@@ -63,31 +63,62 @@ class _JsonTestProtoType(unittest.TestCase):
 	# check http response / valid
 	def _check_resp(self, rules, httpresp):
 	
+		# retrive section from httpresp likes data.list.0.integralNumber
+		def get_resp_section(rule_k, sections):
+			if type(rule_k) == str:
+				rule_k_array = rule_k.split('.')
+			elif type(rule_k) == list:
+				rule_k_array = rule_k
+			else :
+				return None
+			# rule_k_array is list type
+			length = len(rule_k_array)
+			if( length < 1 ) :
+				return None
+			# current checking rule
+			cur_rule = rule_k_array[0]
+			# sections dict ? list ? 
+			if type(sections) == dict:
+				cur_section = sections[ cur_rule ]
+			elif type(sections) == list:
+				cur_section = sections[ int(cur_rule) ]
+			if( length == 1 ) :
+				return cur_section
+			return get_resp_section(rule_k_array[1:], cur_section)
+			
 		# must json format response?
 		if type(httpresp) != dict or type(rules) != dict :
-			print("Got none json format response")
+			print(_("Got none json format response"))
 			return 
+
+		# dump 
+		print(_("Interface response"))
+		print(json.dumps(httpresp, sort_keys=True, indent=2))
 		
-		print(httpresp)
 		# check begin / "state": {"eq":0} rule_k == state, rule_v = {"eq":0}
 		for (rule_k, rule_v) in rules.items():
 			
-			# 
-			#self.assertTrue(rule_k in httpresp, "没有返回%s字段" % rule_k)
-			resp_v = httpresp[rule_k]
+			# rule_k / data.list.0.integralNumber
+			resp_v = get_resp_section(rule_k, httpresp)
+			self.assertIsNotNone(resp_v, "%s: %s" % ( _("Has no section"), rule_k) )
+
+			# failed str
+			rule_k_failed = "%s %s %s" % (rule_k, _("does not match"), rule_v)
+
+			# apply the rules 
 			for (k, pattern) in rule_v.items():
-				
+
 				if k == 'eq':
-					self.assertEqual(pattern, resp_v)
+					self.assertEqual(pattern, resp_v, rule_k_failed)
 				elif k == 'type':
-					self.assertEqual(type(resp_v).__name__, pattern)
+					self.assertEqual(type(resp_v).__name__, pattern, rule_k_failed)
 				elif k == 're':
 					# v == "[a-z0-9]+" 
-					self.assertIsNotNone(re.match(pattern, resp_v))
+					self.assertIsNotNone(re.match(pattern, resp_v), rule_k_failed)
 			
 	# execute a json / python requests
 	def _exe_Jsons(self, oneJson, *args, **awd):
-	
+
 		# No exception when access dict
 		def getKeyParameter(vdict):
 			for (k,v) in vdict.items():
@@ -113,6 +144,9 @@ class _JsonTestProtoType(unittest.TestCase):
 					mysql_config[sql_k] = sql_v
 
 			if "command" in v:
+				print('%s: %s' % (_("Execute SQL"), v['command']))
+				print('%s: %s' % (_("Database"), json.dumps(mysql_config, sort_keys=True, indent=2)) )
+				
 				result = mysqldb.exec_sql(v['command'])
 				if 'key' in oneJson:
 					for i, item in enumerate(oneJson["key"]):
@@ -139,6 +173,11 @@ class _JsonTestProtoType(unittest.TestCase):
 			headers = {'content-type': 'application/json'}
 			if 'headers' in v:
 				headers = v['headers']
+
+			# print before the request
+			print('%s URL: %s' % (_("Test"), url))
+			print('%s header: %s' % ( _("Test"), json.dumps(headers)))
+			print('%s: %s' % ( _("Test parameters"), json.dumps(v['param'])) )
 			
 			# we store http response 
 			if method == 'get':
@@ -147,16 +186,15 @@ class _JsonTestProtoType(unittest.TestCase):
 				else:
 					r = requests.get(url, headers=headers)
 			else:
-				r = requests.post(url, data=v, headers=headers)
+				r = requests.post(url, data=json.dumps(v['param']), headers=headers)
 			awd['httpresp'] = json.loads(r.text)
 		if 'output' in oneJson:
 			# check response
 			self._check_resp(oneJson['output'], awd['httpresp'])
 
-	# 执行测试用例
+	# execute the testcase
 	def _exe_testcase(self):
 		'''Execute the test case'''
-
 		# execute the testcase
 		key = {}
 		httpresp = {}
@@ -171,7 +209,7 @@ class _JsonTestProtoType(unittest.TestCase):
 			self._exe_testcase()
 		return func
 		
-# 为json形式的testcase构建unittest形式的用例
+# build the testcase for json format file/folder
 def makeJsonSuite(json_testcases):
 
 	funNumber = 0
@@ -198,6 +236,7 @@ def makeJsonSuite(json_testcases):
 			print(e)
 	return unittest.makeSuite(_JsonTestProtoType)
 
+# build testcase's desc
 def getJsonTestcaseDesc(name):
 	try:
 		return getattr(_JsonTestProtoType, name+'jsondoc')

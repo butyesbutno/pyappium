@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#coding: utf-8
-#python 2.7 / 3.X
+import gettext
+gettext.install('lang', './locale')
+gettext.translation('lang', './locale', languages=['cn']).install(True)
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +26,7 @@ __author__ = "Michael Wang"
 __version__ = "0.1.0"
 
 if __name__ == "__main__":
-	
+
 	# 获取命令行参数 / obtain the commandline parameters
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-r", "--remove_suite", required = False, help = "Specify removed testsuit")
@@ -45,19 +47,19 @@ if __name__ == "__main__":
 	if remove_suite != None:
 		remove_suite_list = remove_suite.split(',')
 
-	print(AppiumServer)
 	# 获取当前正在链接的设备 / the connected mobile phone
 	if deviceName == None :
 		devlst = pyLib.getConnectAndroidDevices()
 		if(len(devlst) >0):
 			deviceName = devlst[0]
-	if deviceName == None :
-		print(u"当前没有设备链接")
-		exit(0)
-	desired_caps['deviceName']=deviceName
-	devDesc = pyLib.getAndroidDevProp(deviceName)
-	print("Run test on %s. Brand/Model %s" % (deviceName, devDesc))
-	
+	if deviceName != None :
+		desired_caps['deviceName']=deviceName
+		devDesc = pyLib.getAndroidDevProp(deviceName)
+		print("Run test on %s. Brand/Model %s" % (deviceName, devDesc))
+	else:
+		devDesc = ""
+		deviceName = ""
+
 	# 上一级基准目录 / the base path
 	BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 	
@@ -65,7 +67,7 @@ if __name__ == "__main__":
 	if appName != None:
 		desired_caps['app']=BASE_DIR + '/apps/' + appName
 		if(os.path.exists(desired_caps['app']) == False):
-			print(u'%s 不存在' % desired_caps['app'])
+			print(u'%s %s' % (desired_caps['app']), _('Not Exist'))
 			exit(0)
 
 	# 生成测试报告目录 / create the test report directory
@@ -99,15 +101,15 @@ if __name__ == "__main__":
 	# 查找所有json格式的用例 / build all testcase write by json
 	json_testcases = pyLib.walkJsonFiles(basepath + "/json/")
 	suit.addTests(makeJsonSuite(json_testcases))
-	
+
 	# has no tests?
 	if suit.countTestCases() < 1 :
-		print(u'没有可以运行的测试用例');
+		print(_('No testcase'));
 		exit(0)
 
 	# execute the test case
 	fp = open(reportpath, 'wb')	
 	runner = HTMLTestRunner(stream=fp, title=title, description=description)
-	runner.run(suit, deviceName+devDesc)
+	runner.run(suit, devDesc+deviceName)
 	fp.close()
 

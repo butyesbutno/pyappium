@@ -26,16 +26,13 @@ import xlrd, unittest, os, time, importlib
 class _XmlTestProtoType(unittest.TestCase):
 	'''XML 测试用例'''
 
-	# 测试准备
 	def setUp(self):
-		# appium & 启动app/activity
+		# appium & start app/activity
 		self.driver = webdriver.Remote(AppiumServer, desired_caps)
 
-	# 测试结束
 	def tearDown(self):
 		self.driver.quit()
 
-	# 初始化
 	def __init__(self, methodName='runTest'):
 
 		super(_XmlTestProtoType, self).__init__(methodName)
@@ -84,7 +81,7 @@ class _XmlTestProtoType(unittest.TestCase):
 		# xml:domethod / pycode:shoptest
 		method_array = method_name.split(':')
 		if len(method_array) < 2 :
-			print("Xml format error - %s" % method_name)
+			print("%s - %s" % (_("Xml function error"), method_name))
 			return False
 
 		if method_array[0] == "xml":
@@ -135,7 +132,7 @@ class _XmlTestProtoType(unittest.TestCase):
 				print(translated_v)
 				continue
 			if k == "index":
-				print(u"XML步骤(%s)正在执行" % v)
+				#print(u"XML步骤(%s)正在执行" % v)
 				continue
 			if k == "h5" and len(translated_v) > 0:
 				pyLib.switch_context(translated_v)
@@ -165,7 +162,6 @@ class _XmlTestProtoType(unittest.TestCase):
 				except:
 					pass
 				filepath += v + "_%d.png" % int(time.strftime("%Y%m%d%H%M"))
-				print(filepath)
 				self.driver.get_screenshot_as_file(filepath)
 			elif k == "swipe":
 				# swipe="2/3,1/3,1/3,1/3,1000"
@@ -216,7 +212,7 @@ class _XmlTestProtoType(unittest.TestCase):
 				if v.startswith('@'):
 					self._exe_xmlMethod(element, v[1:])
 
-	# 执行测试用例
+	# Execute the test case
 	def _exe_testcase(self):
 		'''Execute the test case'''
 
@@ -331,7 +327,7 @@ class _XmlTestProtoType(unittest.TestCase):
 			self._exe_testcase()
 		return func
 
-# 为xml形式的testcase构建unittest形式的用例
+# build the testcase for xml format file/folder
 def makeXmlSuite(xml_testcases):
 
 	funNumber = 0
@@ -352,6 +348,7 @@ def makeXmlSuite(xml_testcases):
 			print("Xml file %s has error" % filename)
 	return unittest.makeSuite(_XmlTestProtoType)
 
+# build testcase's desc
 def getXmlTestcaseDesc(name):
 	try:
 		return getattr(_XmlTestProtoType, name+'xmldoc')
