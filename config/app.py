@@ -17,11 +17,19 @@ desired_caps = {
 		'resetKeyboard':'True'
 	}
 
-# 请确保此名称可以创建目录，不能包含.，将仅仅运行testcase/yourapp/目录下面的测试用例
+mysql_config = {
+    "host": "172.30.2.28",
+    "user": "test_user",
+    "passwd": "SjFuyBpuHBJnHiFT",
+    "port": 18806,
+    "db": "uic"
+    }
+	
+# 请确保此名称可以创建目录，将仅仅运行testcase/星链生活V370/目录下面的测试用例
 # Please make sure of CurAppName can mkdir, we will only run testcase under testcase/"CurAppName"/ 
 CurAppName = "yourapp"
 
 # 默认appium server
 AppiumServer = 'http://127.0.0.1:4723/wd/hub'
 
-__all__=["desired_caps", "CurAppName", "AppiumServer"]
+__all__=["desired_caps", "CurAppName", "AppiumServer", "mysql_config"]

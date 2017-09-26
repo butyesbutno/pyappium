@@ -103,7 +103,7 @@ import sys
 import time
 import unittest
 from xml.sax import saxutils
-from . import XmlParser
+from . import XmlParser, JsonParser
 
 
 # ------------------------------------------------------------------------
@@ -786,7 +786,8 @@ class HTMLTestRunner(Template_mixin):
 		name = t.id().split('.')[-1]
 		doc = t.shortDescription() or ""
 		xmldesc = XmlParser.getXmlTestcaseDesc(name)
-		desc = xmldesc or doc or name
+		Jsondesc = JsonParser.getJsonTestcaseDesc(name)
+		desc = xmldesc or Jsondesc or doc or name
 		if sys.version_info.major < 3:
 			desc = desc.decode('utf8')
 		tmpl = has_output and self.REPORT_TEST_WITH_OUTPUT_TMPL or self.REPORT_TEST_NO_OUTPUT_TMPL

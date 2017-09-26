@@ -96,6 +96,10 @@ if __name__ == "__main__":
 		pyfile = pyfile.replace('\\\\', '.')
 		suit.addTests(unittest.defaultTestLoader.loadTestsFromName(pyfile))
 
+	# 查找所有json格式的用例 / build all testcase write by json
+	json_testcases = pyLib.walkJsonFiles(basepath + "/json/")
+	suit.addTests(makeJsonSuite(json_testcases))
+	
 	# has no tests?
 	if suit.countTestCases() < 1 :
 		print(u'没有可以运行的测试用例');

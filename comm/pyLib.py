@@ -254,3 +254,21 @@ def walkPyFiles(rootDir, exclude_relative_path_list):
 			if lst is not None:
 				pylst += lst
 	return pylst
+
+
+# 遍历目录下所有json类型目录
+def walkJsonFiles(rootDir):
+	jsonlst = []
+	for root,dirs,files in os.walk(rootDir):
+		for file in files:
+
+			if(file.lower().endswith('.json') == False):
+				continue
+
+			jsonlst.append(root)
+			break
+		for dir in dirs:
+			lst = walkJsonFiles(dir)
+			if lst is not None:
+				jsonlst += lst
+	return jsonlst
