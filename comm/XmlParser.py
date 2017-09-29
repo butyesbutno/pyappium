@@ -21,14 +21,18 @@ from appium import webdriver
 from xml.etree import ElementTree
 from . import pyLib
 from config import *
-import xlrd, unittest, os, time, importlib
+import xlrd, unittest, os, time, importlib, platform
 
 class _XmlTestProtoType(unittest.TestCase):
 	'''XML 测试用例'''
 
 	def setUp(self):
-		# appium & start app/activity
-		self.driver = webdriver.Remote(AppiumServer, desired_caps)
+		try:
+			# appium & start app/activity
+			self.driver = webdriver.Remote(AppiumServer, desired_caps)
+		except:
+			print(_('No webdriver connection'))
+		self.assertIsNotNone(self.driver)
 
 	def tearDown(self):
 		self.driver.quit()
@@ -86,19 +90,32 @@ class _XmlTestProtoType(unittest.TestCase):
 
 		if method_array[0] == "xml":
 			for xmlmethod in self._xmlmethodNode:
+				# find match xml process
 				if(xmlmethod.attrib["name"] != method_name):
 					continue
-				lst = xmlmethod.getchildren()
+				# execute desc
+				print('%s: %s' % (_('Execute xml process'), method_name))
+				# execute
+				lst = xmlmethod.getchildren() 
 				for n in lst:
-					if ( self.__exe_step( n.attrib) == False) :
+					if ( self.__exe_step(n.attrib, subproc=1) == False) :
 						return False
 		elif method_array[0] == "pycode":
+		
+			# build python code import path
 			libpath = 'app_logic.' + CurAppName ;
 			libs = method_array[1].split('.')
 			for i in range(len(libs) - 1):
 				libpath += '.' + libs[i]
+			# support chinese path
+			if platform.platform().find("Window") >= 0:
+				libpath = libpath.decode('utf-8').encode('gbk')
+			# Load / import
 			lib = importlib.import_module(libpath)
 			evalStr = "lib."+ libs[len(libs)-1] + "(self.driver, " + "element)"
+			# execute desc
+			print('%s: %s' % (_('Execute python process'), evalStr))
+			# execute
 			eval(evalStr)
 		return True
 
@@ -123,17 +140,21 @@ class _XmlTestProtoType(unittest.TestCase):
 			except:
 				return None
 
+		# the step's desc str
+		step_desc_str = "<step "
+		if 'subproc' in awd:
+			step_desc_str = "\t<step "
+		
 		# try execute this step
 		# first find the element
 		element = None
 		for (k,v) in oneStep.items():
+			# v = oneStep[k] / translated_v = translated(v) if v startswith '@'
 			translated_v = SafeAccessStepDict(k)
+			# build / recovery step desc
+			step_desc_str += ('%s="%s" ' % (k, translated_v))			
 			if k == "desc":
 				print(translated_v)
-				continue
-			if k == "index":
-				#print(u"XML步骤(%s)正在执行" % v)
-				continue
 			if k == "h5" and len(translated_v) > 0:
 				pyLib.switch_context(translated_v)
 			if k == "id":
@@ -151,7 +172,11 @@ class _XmlTestProtoType(unittest.TestCase):
 					element = pyLib.tryGetElementByName(self.driver, v)
 				else:
 					element = translated_v
-
+		
+		# executing the step
+		step_desc_str += ' />'
+		print(step_desc_str)
+		
 		# step's attributes
 		for (k,v) in oneStep.items():
 			translated_v = SafeAccessStepDict(k)
@@ -222,7 +247,7 @@ class _XmlTestProtoType(unittest.TestCase):
 		author = getattr(self, "author", "")
 		version = getattr(self, "version", "")
 		loopcount = getattr(self, "loopcount", "")
-		print(desc + ', write by ' + author + ', for ' + platform + ', version ' + version)
+		print('%s: %s %s: %s %s: %s %s: %s' % (_('Execute testcase'), desc, _('author'), author, _('platform'), platform, _('version'), version))
 
 		# execute the testcase
 		for oneStep in self._step:
@@ -246,7 +271,7 @@ class _XmlTestProtoType(unittest.TestCase):
 				# the loops defined correctly?
 				total_steps = len(oneStep)-1
 				if total_steps < 1 :
-					print("Loop "+ loopdesc + " finished")
+					print('%s: %s %s' % (_('Execute loop'), loopdesc, _('End')) )
 					continue
 
 				# execute loops
@@ -272,10 +297,12 @@ class _XmlTestProtoType(unittest.TestCase):
 						if all_fields_none:
 							break
 
-					print("Loop "+ loopdesc + " execute sequence %d" % seq)
+					# execute loop times
+					print('%s: %s %d' % (_('Execute loop'), loopdesc, seq) )
+
 					# execute this loop!
 					for j in range(total_steps):
-						self._exe_step(oneStep[j+1], fields=fields)
+						self._exe_step(oneStep[j+1], subproc=1, fields=fields)
 
 					# Has no data?
 					if loop_untile_nodata and fieldgen_no_data:
@@ -286,6 +313,9 @@ class _XmlTestProtoType(unittest.TestCase):
 					seq = seq + 1
 			else:
 				self._exe_step(oneStep)
+
+		# Testcase End
+		print(_("Testcase End"))
 
 	# generator of any parameter start with @
 	@staticmethod
@@ -349,8 +379,11 @@ def makeXmlSuite(xml_testcases):
 	return unittest.makeSuite(_XmlTestProtoType)
 
 # build testcase's desc
-def getXmlTestcaseDesc(name):
+def getXmlTestcaseDesc(tids):
 	try:
+		if tids.index("_XmlTestProtoType") < 0:
+			return None
+		name = tids.split('.')[-1]
 		return getattr(_XmlTestProtoType, name+'xmldoc')
 	except:
 		return None

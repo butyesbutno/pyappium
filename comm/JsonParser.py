@@ -17,7 +17,7 @@
 __author__ = 'michael'
 __version__ = "0.1.0"
 
-import unittest, json, os, re, requests, codecs
+import unittest, json, os, re, requests, codecs, sys, platform
 from config import *
 from . import mysqldb
 
@@ -100,10 +100,13 @@ class _JsonTestProtoType(unittest.TestCase):
 			
 			# rule_k / data.list.0.integralNumber
 			resp_v = get_resp_section(rule_k, httpresp)
-			self.assertIsNotNone(resp_v, "%s: %s" % ( _("Has no section"), rule_k) )
+			# assert the section exist unicode -> utf-8
+			txt = "%s: %s" % ( _("Has no section"), rule_k)
+			self.assertIsNotNone(resp_v,  txt.encode('utf-8'))
 
 			# failed str
 			rule_k_failed = "%s %s %s" % (rule_k, _("does not match"), rule_v)
+			rule_k_failed = rule_k_failed.encode('utf-8')
 
 			# apply the rules 
 			for (k, pattern) in rule_v.items():
@@ -219,6 +222,7 @@ def makeJsonSuite(json_testcases):
 			setattr(_JsonTestProtoType, "test" + str(funNumber), _JsonTestProtoType.newTestCase(folder))
 			# set testcase's desc
 			try:
+
 				desc = None
 				eles = folder.replace('\\', '/').split('/')
 				for j in range(len(eles)-1, 0, -1):
@@ -226,6 +230,8 @@ def makeJsonSuite(json_testcases):
 						desc = eles[j]
 						break
 				if desc :
+					if sys.version_info.major < 3 and platform.platform().find("Window") >= 0:
+						desc = desc.decode('gbk').encode('utf-8')
 					setattr(_JsonTestProtoType, "test" + str(funNumber)+'jsondoc', desc)
 			except:
 				pass
@@ -237,8 +243,11 @@ def makeJsonSuite(json_testcases):
 	return unittest.makeSuite(_JsonTestProtoType)
 
 # build testcase's desc
-def getJsonTestcaseDesc(name):
+def getJsonTestcaseDesc(tids):
 	try:
+		if tids.index("_JsonTestProtoType") < 0:
+			return None
+		name = tids.split('.')[-1]
 		return getattr(_JsonTestProtoType, name+'jsondoc')
 	except:
 		return None

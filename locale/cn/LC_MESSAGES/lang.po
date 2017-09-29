@@ -47,3 +47,26 @@ msgstr "返回中没有字段"
 msgid "does not match"  
 msgstr "不符合规则"
 
+msgid "Execute testcase"  
+msgstr "执行测试用例"
+
+msgid "Testcase End"  
+msgstr "测试用例完成"
+
+msgid "Execute python process"
+msgstr "执行Python过程"
+
+msgid "version"  
+msgstr "版本"
+
+msgid "platform"  
+msgstr "平台"
+
+msgid "author"  
+msgstr "作者"
+
+msgid "Execute loop"  
+msgstr "执行循环"
+
+msgid "No webdriver connection"  
+msgstr "Appium 没有启动或没有设备"

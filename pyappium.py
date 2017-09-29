@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+#coding: utf-8
 import gettext
-gettext.install('lang', './locale')
-gettext.translation('lang', './locale', languages=['cn']).install(True)
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +23,18 @@ from config import *
 __author__ = "Michael Wang"
 __version__ = "0.1.0"
 
+# window platform or linux platform
+import platform
+iswindow = platform.platform().find("Window")>=0
+encodestr = "utf-8"
+if iswindow:
+	encodestr = "gbk"
+
 if __name__ == "__main__":
+
+	gettext.install('lang', './locale')
+	gettext.translation('lang', './locale', languages=['cn']).install(True)
+
 
 	# 获取命令行参数 / obtain the commandline parameters
 	ap = argparse.ArgumentParser()
@@ -82,6 +91,9 @@ if __name__ == "__main__":
 
 	# 执行../testcase/CurAppName/以及子目录测试用例 / execute testcases under ../testcase/CurAppName/
 	basepath = BASE_DIR + "/testcase/" + CurAppName
+	# basepath: utf8 -> gbk(windows system)
+	if sys.version_info.major < 3 and iswindow:
+		basepath = basepath.decode('utf-8').encode(encodestr)
 	suit = unittest.TestSuite()
 
 	# 构建所有xml格式的测试用例 / build all testcase write by xml

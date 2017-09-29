@@ -16,7 +16,7 @@
 
 from appium.webdriver.mobilecommand import MobileCommand
 from xml.etree import ElementTree
-import time,sys,os,unittest,subprocess
+import time,sys,os,unittest, subprocess, chardet
 
 __author__ = "Michael Wang"
 __version__ = "0.1.0"
@@ -65,6 +65,18 @@ def getAndroidDevProp(deviceName):
 	brandAndModelStr = brandAndModelStr.replace('\n', '')
 	return brandAndModelStr
 
+# unknown format -> unicode
+def str2Unicode(txt):
+	if sys.version_info.major > 2:
+		return txt
+	if type(txt) == unicode:
+		return txt
+	try:
+		txt_format = chardet.detect(txt)["encoding"]
+		return txt.decode(txt_format)
+	except:
+		return txt
+		
 # find_element_by_id may throw exception
 def getElement(driver, resId):
 	try:

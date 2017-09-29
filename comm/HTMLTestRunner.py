@@ -103,7 +103,7 @@ import sys
 import time
 import unittest
 from xml.sax import saxutils
-from . import XmlParser, JsonParser
+from . import XmlParser, JsonParser, pyLib
 
 
 # ------------------------------------------------------------------------
@@ -124,12 +124,8 @@ class OutputRedirector(object):
 		self.basic_fp = fp
 
 	def write(self, s):
-		if(sys.version_info.major < 3 and type(s) == str) :
-			self.fp.write(s.decode('utf-8'))
-			self.basic_fp.write(s.decode('utf-8'))
-		else:
-			self.fp.write(s)
-			self.basic_fp.write(s)
+		self.fp.write(pyLib.str2Unicode(s))
+		self.basic_fp.write(pyLib.str2Unicode(s))
 
 	def writelines(self, lines):
 		self.fp.writelines(lines)
@@ -752,8 +748,7 @@ class HTMLTestRunner(Template_mixin):
 				name = "%s.%s" % (cls.__module__, cls.__name__)
 			doc = cls.__doc__ and cls.__doc__.split("\n")[0] or ""
 			desc = doc or name
-			if sys.version_info.major < 3:
-				desc = desc.decode('utf8')
+			desc = pyLib.str2Unicode(desc)
 
 			row = self.REPORT_CLASS_TMPL % dict(
 				style = ne > 0 and 'errorClass' or nf > 0 and 'failClass' or 'passClass',
@@ -785,30 +780,24 @@ class HTMLTestRunner(Template_mixin):
 		tid = (n == 0 and 'p' or 'f') + 't%s.%s' % (cid+1,tid+1)
 		name = t.id().split('.')[-1]
 		doc = t.shortDescription() or ""
-		xmldesc = XmlParser.getXmlTestcaseDesc(name)
-		Jsondesc = JsonParser.getJsonTestcaseDesc(name)
+		xmldesc = XmlParser.getXmlTestcaseDesc(t.id())
+		Jsondesc = JsonParser.getJsonTestcaseDesc(t.id())
 		desc = xmldesc or Jsondesc or doc or name
-		if sys.version_info.major < 3:
-			desc = desc.decode('utf8')
+		desc = pyLib.str2Unicode(desc)
+		
 		tmpl = has_output and self.REPORT_TEST_WITH_OUTPUT_TMPL or self.REPORT_TEST_NO_OUTPUT_TMPL
 
 		# o and e should be byte string because they are collected from stdout and stderr?
 		if isinstance(o,str):
 			# TODO: some problem with 'string_escape': it escape \n and mess up formating
 			# uo = unicode(o.encode('string_escape'))
-			if sys.version_info.major < 3:
-				uo = o.decode('latin-1')
-			else:
-				uo = o
+			uo = pyLib.str2Unicode(o)
 		else:
 			uo = o
 		if isinstance(e,str):
 			# TODO: some problem with 'string_escape': it escape \n and mess up formating
 			# ue = unicode(e.encode('string_escape'))
-			if sys.version_info.major < 3:
-				ue = e.decode('latin-1')
-			else:
-				ue = e
+			ue = pyLib.str2Unicode(e)
 		else:
 			ue = e
 
