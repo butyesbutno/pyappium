@@ -26,7 +26,7 @@ class _JsonTestProtoType(unittest.TestCase):
 
 	# testcase prepare
 	def setUp(self):
-		pass
+		print( "\nJson:\t%s" % _JsonTestProtoType.__doc__)
 
 	# testcase ending
 	def tearDown(self):

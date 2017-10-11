@@ -21,12 +21,15 @@ from appium import webdriver
 from xml.etree import ElementTree
 from . import pyLib
 from config import *
-import xlrd, unittest, os, time, importlib, platform
+import xlrd, unittest, os, time, sys, importlib, platform
 
 class _XmlTestProtoType(unittest.TestCase):
 	'''XML 测试用例'''
 
 	def setUp(self):
+
+		print( "\nXml:\t%s" % _XmlTestProtoType.__doc__)
+
 		try:
 			# appium & start app/activity
 			self.driver = webdriver.Remote(AppiumServer, desired_caps)
@@ -108,7 +111,7 @@ class _XmlTestProtoType(unittest.TestCase):
 			for i in range(len(libs) - 1):
 				libpath += '.' + libs[i]
 			# support chinese path
-			if platform.platform().find("Window") >= 0:
+			if sys.version_info.major < 3 and platform.platform().find("Window") >= 0:
 				libpath = libpath.decode('utf-8').encode('gbk')
 			# Load / import
 			lib = importlib.import_module(libpath)
@@ -131,11 +134,10 @@ class _XmlTestProtoType(unittest.TestCase):
 					for (k,v) in fields.items():
 						if v == None :
 							continue
-						if type(v) == str:
+						if '@'+k == val :
+							return v
+						if type(v) == str or (sys.version_info.major < 3 and type(v) == unicode):
 							val = val.replace("@" + k, v)
-						else:
-							if '@'+k == val :
-								return v
 				return val
 			except:
 				return None
@@ -158,17 +160,17 @@ class _XmlTestProtoType(unittest.TestCase):
 			if k == "h5" and len(translated_v) > 0:
 				pyLib.switch_context(translated_v)
 			if k == "id":
-				if type(translated_v) == str :
+				if type(translated_v) != webdriver.webelement.WebElement :
 					element = pyLib.tryGetElement(self.driver, v)
 				else:
 					element = translated_v
 			elif k == "xpath":
-				if type(translated_v) == str :
+				if type(translated_v) != webdriver.webelement.WebElement :
 					element = pyLib.tryGetElementByXPath(self.driver, v)
 				else:
 					element = translated_v
 			elif k == "name":
-				if type(translated_v) == str :
+				if type(translated_v) != webdriver.webelement.WebElement :
 					element = pyLib.tryGetElementByName(self.driver, v)
 				else:
 					element = translated_v

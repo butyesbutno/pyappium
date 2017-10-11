@@ -31,7 +31,7 @@ def switch_app(driver):
 def switch_context(driver):
 	driver.execute(MobileCommand.SWITCH_TO_CONTEXT, {"name": webview_content})
 
-# 获取相连的安卓机器名称
+# The connected android devices name
 def getConnectAndroidDevices():
 	devlst = []
 	subp = subprocess.Popen('adb devices',shell=True,stdout=subprocess.PIPE)
@@ -46,8 +46,9 @@ def getConnectAndroidDevices():
 	subp.wait()
 	return devlst
 
-# 获取相连的安卓机器品牌/型号
+# The connected android devices's brand / model
 def getAndroidDevProp(deviceName):
+	# sometimes, if devices not ready, will block here
 	brandAndModelStr = ""
 	subp = subprocess.Popen( 'adb -s ' + deviceName + ' shell getprop | findstr product',shell=True,stdout=subprocess.PIPE)
 	l = subp.stdout.readline()
@@ -141,7 +142,7 @@ def tryGetElementByName(driver, inname, waittingsecond=10):
 			time.sleep(1)
 	return None
 
-# 清除EditText文本框里的内容，@param:text 要清除的内容
+# Clear / 清除EditText文本框里的内容，@param:text 要清除的内容
 def edittextclear(driver, text):
 	driver.keyevent(123)
 	for i in range(0,len(text)):
@@ -161,13 +162,13 @@ def setTextValue(element, val):
 	except:
 		pass
 
-#获得机器屏幕大小x,y / the screen size
+# Obtain screen size 
 def getScreenSize(driver):
 	x = driver.get_window_size()['width']
 	y = driver.get_window_size()['height']
 	return (x, y)
 
-# 相对滑动
+# relative swipe
 def swipeRelative(driver, ratioX1, ratioY1, ratioX2, ratioY2, t):
 	l = getScreenSize(driver)
 	x1 = int(l[0] * ratioX1)	#x坐标

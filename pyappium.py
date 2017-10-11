@@ -32,9 +32,9 @@ if iswindow:
 
 if __name__ == "__main__":
 
+	# multi-lang / chinese-han
 	gettext.install('lang', './locale')
 	gettext.translation('lang', './locale', languages=['cn']).install(True)
-
 
 	# 获取命令行参数 / obtain the commandline parameters
 	ap = argparse.ArgumentParser()
@@ -80,14 +80,15 @@ if __name__ == "__main__":
 			exit(0)
 
 	# 生成测试报告目录 / create the test report directory
-	reportpath = BASE_DIR + '/report/'
+	reportpath = BASE_DIR + '/report/' + CurAppName
+	# reportpath: utf8 -> gbk(windows system)
+	if sys.version_info.major < 3 and iswindow:
+		reportpath = reportpath.decode('utf-8').encode(encodestr)
 	try:
 		os.mkdir(reportpath)
 	except:
 		pass
-	t = datetime.datetime.now()
-	#reportpath += "report-" + '%d-%02d-%02d-%02d-%02d-%02d' % (t.year,t.month,t.day,t.hour, t.minute, t.second) + '.html'
-	reportpath += 'report.html'
+	reportpath += '/report.html'
 
 	# 执行../testcase/CurAppName/以及子目录测试用例 / execute testcases under ../testcase/CurAppName/
 	basepath = BASE_DIR + "/testcase/" + CurAppName
